@@ -10,13 +10,15 @@ export const account = new Account(client);
 
   export const loginWithGoogle = async () => {
     try {
-      await account.createOAuth2Session(
+        await account.createOAuth2Session(
         OAuthProvider.Google,
-        'http://localhost:3000',
-        'http://localhost:3000/fail'
+        'http://localhost:3000/home',
+        'http://localhost:3000/fail',
+        ['email', 'profile', 'openid']
       )
+    
     } catch (error) {
-      console.error(error)
+      console.error('OAuth login error:', error);
     }
   }
   
@@ -35,6 +37,19 @@ export const account = new Account(client);
       console.error(error)
     }
   }
+
+  export const getCurrentSession = async () => {
+    try {
+      const session = await account.getSession('current');
+      console.log('Provider:', session.provider);
+      console.log('Provider UID:', session.providerUid);
+      console.log('Provider Access Token:', session.providerAccessToken);
+      return session;
+    } catch (error) {
+      console.error("Error fetching session:", error);
+      return null;
+    }
+  };
 
 export { ID } from 'appwrite';
 export { OAuthProvider } 
