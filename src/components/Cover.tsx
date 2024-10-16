@@ -3,8 +3,11 @@
 import React from "react";
 import { Cover } from "@/components/ui/cover";
 import BorderButton from "./BorderButton";
+import { useRouter } from "next/navigation";
 
 export function CoverDemo() {
+
+    const router = useRouter();
   return (
     <div>
       <h1 className="text-4xl md:text-4xl lg:text-6xl font-semibold max-w-7xl mx-auto text-center mt-20 relative z-20 py-6 bg-clip-text text-transparent bg-gradient-to-b from-neutral-800 via-neutral-700 to-neutral-700 dark:from-neutral-800 dark:via-white dark:to-white">
@@ -19,7 +22,7 @@ export function CoverDemo() {
      </div>
 
      <div className="flex justify-center mt-10">
-         <BorderButton onClick={() => {}} text="Get started" />
+         <BorderButton onClick={() => router.push('/home')} text="Get started" />
      </div>
     </div>
   );

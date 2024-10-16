@@ -10,7 +10,11 @@ export const account = new Account(client);
 
   export const loginWithGoogle = async () => {
     try {
-      await account.createOAuth2Session(OAuthProvider.Google)
+      await account.createOAuth2Session(
+        OAuthProvider.Google,
+        'http://localhost:3000',
+        'http://localhost:3000/fail'
+      )
     } catch (error) {
       console.error(error)
     }
