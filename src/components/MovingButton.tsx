@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "./ui/moving-border";
 
-export function MovingBorderDemo() {
+export function MovingButton() {
   return (
     <div>
       <Button

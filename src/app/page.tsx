@@ -1,9 +1,9 @@
 import Image from "next/image";
-import { HeroHighlightDemo } from "@/components/Hero";
+import { GridBackgroundDemo } from "@/components/GridBackground";
 export default function Home() {
   return (
     <>
-      <HeroHighlightDemo />
+      <GridBackgroundDemo />
     </>
   );
 }
