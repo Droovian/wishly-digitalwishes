@@ -4,17 +4,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect } from 'react'
 import BorderButton from './BorderButton'
-import { loginWithGoogle, logoutUser, getUser } from '@/appwrite/appwrite';
-import { useGlobalContext } from '@/context/app-provider';
+import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
+import { SignOutButton } from '@clerk/nextjs';
 const Navbar = () => {
-
-    const { user, setUser, isLogged, setIsLogged } = useGlobalContext()!;
-
-    const handleLogout = async() => {
-        await logoutUser();
-        setIsLogged(false);
-        setUser(null);
-    }
 
   return (
     <div className='w-full h-20 bg-white border-b-1 border-gray-500'>
@@ -26,16 +18,16 @@ const Navbar = () => {
                     <Link href={"/contact"} className='hover:text-gray-800'>Reach out</Link>
                 </ul>
             </div>
-            {
-            !isLogged ? 
-            <div>
-                <BorderButton text='Sign Up' onClick={loginWithGoogle} />
-            </div> : (
-                
-                 <BorderButton text='Logout' onClick={handleLogout} />
-
-            )
-            }
+            <div className="flex items-center">
+                <SignedIn>
+                    <SignOutButton redirectUrl='/' />
+                </SignedIn>
+                <SignedOut>
+                <SignInButton>
+                    <BorderButton text='Sign in' />
+                </SignInButton>
+                </SignedOut>
+            </div>
         </div>
     </div>
   )

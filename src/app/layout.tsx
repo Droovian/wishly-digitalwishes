@@ -3,6 +3,10 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { GlobalProvider } from "@/context/app-provider";
+import {
+  ClerkProvider,
+} from '@clerk/nextjs'
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -24,16 +28,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
+    <ClerkProvider>
     <html lang="en">
-      <GlobalProvider>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col antialiased`}
       >
         <Navbar />
         {children}
       </body>
-      </GlobalProvider>
     </html>
+    </ClerkProvider>
   );
 }

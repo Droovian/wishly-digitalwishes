@@ -4,9 +4,12 @@ import React from "react";
 import { Cover } from "@/components/ui/cover";
 import BorderButton from "./BorderButton";
 import { useRouter } from "next/navigation";
-
+import { useUser } from "@clerk/nextjs";
 export function CoverDemo() {
 
+  // const { isLoaded, user } = useUser();
+  // console.log(user);
+  
     const router = useRouter();
   return (
     <div>
