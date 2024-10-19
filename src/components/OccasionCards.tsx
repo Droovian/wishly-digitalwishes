@@ -8,17 +8,20 @@ export function OccasionCards() {
     {
       title: "Birthday Party",
       src: BirthdayImage,
-      textColor: "#ec4899"
+      textColor: "#ec4899",
+      id: 'birthday'
     },
     {
       title: "Date night",
       src: DateImage,
-      textColor: "#e11d48"
+      textColor: "#e11d48",
+      id: 'date'
     },
     {
       title: "House party",
       src: HousePartyImage,
-      textColor: "#facc15"
+      textColor: "#facc15",
+      id: 'houseparty'
     },
    
   ];

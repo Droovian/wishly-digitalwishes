@@ -3,6 +3,7 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { StaticImageData } from "next/image";
+import Link from "next/link";
 
 export const Card = React.memo(
   ({
@@ -10,15 +11,18 @@ export const Card = React.memo(
     index,
     hovered,
     setHovered,
-    textColor
+    textColor,
+    id
   }: {
     card: any;
     index: number;
     hovered: number | null;
     textColor: string;
+    id: string
     setHovered: React.Dispatch<React.SetStateAction<number | null>>;
   }) => (
-    <div
+    <Link
+      href={`/form/${id}`}
       onMouseEnter={() => setHovered(index)}
       onMouseLeave={() => setHovered(null)}
       className={cn(
@@ -42,7 +46,7 @@ export const Card = React.memo(
            <p style={{color: textColor}}>{card.title}</p>
         </div>
       </div>
-    </div>
+    </Link>
   )
 );
 
@@ -52,6 +56,7 @@ type Card = {
   title: string;
   src: StaticImageData;
   textColor?: string;
+  id: string;
 };
 
 export function FocusCards({ cards }: { cards: Card[] }) {
@@ -62,6 +67,7 @@ export function FocusCards({ cards }: { cards: Card[] }) {
       {cards.map((card, index) => (
         <Card
           key={card.title}
+          id={card.id}
           card={card}
           index={index}
           hovered={hovered}
