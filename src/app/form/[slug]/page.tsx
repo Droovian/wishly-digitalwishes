@@ -23,8 +23,8 @@ export default function Page({ params }: { params: { slug: string}}){
     }
 
     return (
-        <div className="grid grid-cols-1 p-5 sm:grid-cols-2 h-full w-full dark:bg-black bg-white dark:bg-grid-small-white/[0.2] bg-grid-small-black/[0.2]">
-            <div className="hidden lg:flex">
+        <div className="grid grid-cols-1 gap-3 p-12 md:grid-cols-2 dark:bg-black bg-white dark:bg-grid-small-white/[0.2] bg-grid-small-black/[0.2]">
+            <div className="hidden lg:flex gap-3">
                 <Image 
                     src={selectedImage}
                     alt="birthday"
