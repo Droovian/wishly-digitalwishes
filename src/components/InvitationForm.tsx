@@ -1,5 +1,6 @@
 'use client'
-
+import { useUser } from "@clerk/nextjs"
+import { createInvite } from "@/appwrite/appwrite"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+
 const inviteSchema = z.object({
   hostName: z.string().min(2, { message: "Host name must be at least 2 characters." }),
   inviteeName: z.string().optional(),
@@ -37,6 +39,8 @@ const inviteSchema = z.object({
 type InviteFormData = z.infer<typeof inviteSchema>
 
 export default function InviteForm() {
+
+  const { user } = useUser(); 
   const form = useForm<InviteFormData>({
     resolver: zodResolver(inviteSchema),
     defaultValues: {
@@ -51,13 +55,25 @@ export default function InviteForm() {
   })
 
   const onSubmit = async (data: InviteFormData) => {
-    try {
-      console.log("Form Data Submitted:", data)
-      // Perform API call or state update here
-    } catch (error) {
-      console.error("Error submitting form:", error)
+    if (!user) {
+      alert("You must be logged in to create an invitation.");
+      return;
     }
-  }
+
+    const inviteData = {
+      ...data,
+      userId: user.id, // Store the user's ID with the invite
+    };
+
+    try {
+      await createInvite(inviteData);
+      alert("Invitation created successfully!");
+      form.reset(); // Reset the form after success
+    } catch (error) {
+      console.error("Error creating invitation:", error);
+      alert("Failed to create invitation. Please try again.");
+    }
+  };
 
   return (
     <Card className="w-full max-w-2xl mx-auto h-full">
@@ -123,9 +139,9 @@ export default function InviteForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="birthday">Modern</SelectItem>
-                      <SelectItem value="party">Retro</SelectItem>
-                      <SelectItem value="anniversary">Comic book</SelectItem>
+                      <SelectItem value="Modern">Modern</SelectItem>
+                      <SelectItem value="Retro">Retro</SelectItem>
+                      <SelectItem value="Comic">Comic book</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription>Select the look and feel of your invite.</FormDescription>
