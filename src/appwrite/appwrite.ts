@@ -1,4 +1,4 @@
-import { Client, Account, OAuthProvider, Databases, ID, Query } from "appwrite";
+import { Client, Account, OAuthProvider, Databases, ID, Query, Storage } from "appwrite";
 import { useUser } from "@clerk/nextjs";
 
 export const client = new Client();
@@ -11,6 +11,63 @@ client
  const databases = new Databases(client);
  const databaseId = '6710996a000569b8a6ad';
  const userCollectionId = '671099c3003764136a39';
+ const videoCollectionId = '6715235b003bff9c5f45';
+ const bucketId = '6715256f0020032941dd';
+
+ const storage = new Storage(client);
+
+ export async function uploadFile(file: File) {
+  try {
+    const response = await storage.createFile(bucketId, ID.unique(), file);
+    return response;
+  } 
+  catch (error) {
+    console.error('Error uploading file:', error);
+  }
+ }
+
+ export async function uploadVideoWithThumbnail(
+  creatorId: string,
+  title: string,
+  videoFile: File
+) {
+  try {
+    let videoResponse, fileUrl;
+
+    videoResponse = await storage.createFile(bucketId, ID.unique(), videoFile);
+
+    fileUrl = await getFilePreview(videoResponse.$id);
+
+    const videoDoc = await databases.createDocument(
+      databaseId,
+      videoCollectionId,
+      ID.unique(),
+      {
+        title,
+        video: fileUrl, 
+        creatorId,
+      }
+    );
+
+    console.log('Video data successfully stored in Appwrite:', videoDoc);
+    return videoDoc; // Return the created document
+  } catch (error) {
+    console.error('Error storing video data:', error);
+    throw error; // Rethrow the error if needed
+  }
+}
+ 
+ export async function getFilePreview(fileId: string) {
+  try {
+    let fileUrl = await storage.getFileView(bucketId, fileId);
+
+    if(!fileUrl){ throw new Error('File not found')}
+
+    return fileUrl;
+  } catch (error) {
+    console.error('Error fetching file preview:', error);
+  }
+ }
 
  export const storeUserInDatabase = async (userId: string, name: string, email: string) => {
   try {
