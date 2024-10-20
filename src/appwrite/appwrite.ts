@@ -5,14 +5,14 @@ export const client = new Client();
 
 client
   .setEndpoint('https://cloud.appwrite.io/v1')
-  .setProject('670f8c83000b3c68feee') 
- 
- const account = new Account(client);
- const databases = new Databases(client);
- const databaseId = '6710996a000569b8a6ad';
- const userCollectionId = '671099c3003764136a39';
+  .setProject('670f8c83000b3c68feee')
 
- export const storeUserInDatabase = async (userId: string, name: string, email: string) => {
+const account = new Account(client);
+const databases = new Databases(client);
+const databaseId = '6710996a000569b8a6ad';
+const userCollectionId = '671099c3003764136a39';
+const inviteCollectionId = '671510bf0012844ad0a7';
+export const storeUserInDatabase = async (userId: string, name: string, email: string) => {
   try {
     // Check if the user already exists using Query
     const userExists = await databases.listDocuments(
@@ -42,49 +42,73 @@ client
     console.error('Error storing user data:', error);
   }
 };
+export const createInvite = async (inviteData: {
+  hostName: string;
+  inviteeName?: string;
+  customMessage: string;
+  eventDate: string;
+  eventTime?: string;
+  location?: string;
+  template: string;
+  userId: string
+}) => {
+  try {
+    console.log("this one"+inviteData.userId)
+    const response = await databases.createDocument(
+      databaseId,
+      inviteCollectionId,
+      ID.unique(), // Generate unique ID for the invite
+      inviteData
+    );
+    console.log("Invitation successfully created:", response);
+    return response;
+  } catch (error) {
+    console.error("Error creating invitation:", error);
+    throw error; // Ensure error propagates to the UI
+  }
+};
+// export const loginWithGoogle = async () => {
+//   try {
+//       await account.createOAuth2Session(
+//       OAuthProvider.Google,
+//       'http://localhost:3000/home',
+//       'http://localhost:3000/fail',
+//       ['email', 'profile', 'openid']
+//     )
 
-  // export const loginWithGoogle = async () => {
-  //   try {
-  //       await account.createOAuth2Session(
-  //       OAuthProvider.Google,
-  //       'http://localhost:3000/home',
-  //       'http://localhost:3000/fail',
-  //       ['email', 'profile', 'openid']
-  //     )
-    
-  //   } catch (error) {
-  //     console.error('OAuth login error:', error);
-  //   }
-  // }
-  
-  // export const logoutUser = async () => {
-  //   try {
-  //     await account.deleteSession('current')
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
-  
-  // export const getUser = async () => {
-  //   try {
-  //     return await account.get()
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
+//   } catch (error) {
+//     console.error('OAuth login error:', error);
+//   }
+// }
 
-  // export const getCurrentSession = async () => {
-  //   try {
-  //     const session = await account.getSession('current');
-  //     console.log('Provider:', session.provider);
-  //     console.log('Provider UID:', session.providerUid);
-  //     console.log('Provider Access Token:', session.providerAccessToken);
-  //     return session;
-  //   } catch (error) {
-  //     console.error("Error fetching session:", error);
-  //     return null;
-  //   }
-  // };
+// export const logoutUser = async () => {
+//   try {
+//     await account.deleteSession('current')
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
+
+// export const getUser = async () => {
+//   try {
+//     return await account.get()
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
+
+// export const getCurrentSession = async () => {
+//   try {
+//     const session = await account.getSession('current');
+//     console.log('Provider:', session.provider);
+//     console.log('Provider UID:', session.providerUid);
+//     console.log('Provider Access Token:', session.providerAccessToken);
+//     return session;
+//   } catch (error) {
+//     console.error("Error fetching session:", error);
+//     return null;
+//   }
+// };
 
 export { ID } from 'appwrite';
 export { OAuthProvider } 
