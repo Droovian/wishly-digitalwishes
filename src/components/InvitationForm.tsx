@@ -115,17 +115,17 @@ export default function InviteForm() {
               name="template"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Template</FormLabel>
+                  <FormLabel>Theme</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a Template" />
+                        <SelectValue placeholder="Select a Theme" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="birthday">Birthday Template</SelectItem>
-                      <SelectItem value="party">House Party Template</SelectItem>
-                      <SelectItem value="anniversary">Anniversary Template</SelectItem>
+                      <SelectItem value="birthday">Modern</SelectItem>
+                      <SelectItem value="party">Retro</SelectItem>
+                      <SelectItem value="anniversary">Comic book</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription>Select the look and feel of your invite.</FormDescription>
