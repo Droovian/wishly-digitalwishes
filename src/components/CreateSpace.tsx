@@ -1,12 +1,13 @@
 "use client";
 
-import React from 'react'
+import React from "react";
+import { createVideoSpace,getSpacesByCreatorId } from "@/appwrite/appwrite";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
-
+import { useUser } from "@clerk/nextjs";
 import {
   Form,
   FormControl,
@@ -17,47 +18,52 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { useRouter } from "next/navigation";
+// Updated schema to include creator's name
 const spaceSchema = z.object({
-    spaceId: z.string(),
-    name: z.string().min(5, { message: "Title must be at least 5 characters." }),
-    creatorId: z.string(),
-    customMessage: z.string().min(10, { message: "Message must be at least 10 characters." }),
-  });
-  
-  type SpaceFormData = z.infer<typeof spaceSchema>;
+  name: z.string().min(5, { message: "Title must be at least 5 characters." }),
+  createdBy: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  customMessage: z.string().min(10, { message: "Message must be at least 10 characters." }),
+});
+
+type SpaceFormData = z.infer<typeof spaceSchema>;
 
 const CreateSpace = () => {
-
+  const { user } = useUser();
+  const router = useRouter();
   const form = useForm<SpaceFormData>({
     resolver: zodResolver(spaceSchema),
     defaultValues: {
-        spaceId: "",
-        name: "",
-        creatorId: "",
-        customMessage: "",
+      name: "",
+      createdBy: "",
+      customMessage: "",
     },
   });
 
+
   const onSubmit = async (data: SpaceFormData) => {
+
     try {
-      console.log("Form Data Submitted:", data);
-      
+      const response = await createVideoSpace(data,user!.id);
+      alert("successfully created a space")
+      router.push("/dashboard")
+      console.log("Video space created:", response);
     } catch (error) {
       console.error("Error submitting form:", error);
     }
   };
+
   return (
     <Card className="w-3/4 sm:w-1/2">
-      <CardHeader className='text-center'>
+      <CardHeader className="text-center">
         <CardTitle>Create your own video space!</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Video Title */}
+            {/* Space Name */}
             <FormField
               control={form.control}
               name="name"
@@ -68,6 +74,21 @@ const CreateSpace = () => {
                     <Input placeholder="Enter space name..." {...field} />
                   </FormControl>
                   <FormDescription>This will be the name of your space.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Creator's Name */}
+            <FormField
+              control={form.control}
+              name="createdBy"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Creator's Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your name..." {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -96,7 +117,7 @@ const CreateSpace = () => {
         </Form>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default CreateSpace
+export default CreateSpace;
