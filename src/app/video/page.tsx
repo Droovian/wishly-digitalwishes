@@ -1,10 +1,10 @@
 import React from 'react'
 import VideoUploadForm from '@/components/VideoForm'
 
-const Video = () => {
+const Video = (spaceId:string) => {
   return (
     <div className='p-5 flex justify-center items-center'>
-        <VideoUploadForm />
+        <VideoUploadForm spaceId={spaceId} />
     </div>
   )
 }
