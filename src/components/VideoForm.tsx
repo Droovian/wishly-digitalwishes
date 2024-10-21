@@ -29,8 +29,11 @@ const videoSchema = z.object({
 });
 
 type VideoFormData = z.infer<typeof videoSchema>;
+interface VideoProps {
+ spaceId:string ,
+}
 
-export default function VideoUploadForm() {
+const VideoUploadForm: React.FC<VideoProps> = ({ spaceId }) =>  {
 
   const { userId } = useAuth();
   const form = useForm<VideoFormData>({
@@ -53,7 +56,7 @@ export default function VideoUploadForm() {
       }
       
       if(data.video && data.title){
-        const response = await uploadVideoWithThumbnail(userId, data.title, data.video);
+        const response = await uploadVideoWithThumbnail(userId, data.title, data.video,spaceId); //fix this 
         console.log('Video data successfully stored in Appwrite:', response);
       }
       else{
@@ -120,3 +123,5 @@ export default function VideoUploadForm() {
     </Card>
   );
 }
+
+export default VideoUploadForm;

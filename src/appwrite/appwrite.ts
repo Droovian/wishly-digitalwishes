@@ -106,8 +106,8 @@ export const createVideoSpace = async (spaceData: {
 }, userId: string) => {
   try {
     const response = await databases.createDocument(
-      databaseId,
-      spacesId,
+      appwriteConfig.databaseId,
+      appwriteConfig.spacesId,
       ID.unique(), // generates the space id for us
       {
         name: spaceData.name,
@@ -131,8 +131,8 @@ export const createVideoSpace = async (spaceData: {
 export const getSpacesByCreatorId = async (creatorId: string) => {
   try {
     const response = await databases.listDocuments(
-      databaseId,  // Your Database ID
-      spacesId, //spaces id
+      appwriteConfig.databaseId,  // Your Database ID
+      appwriteConfig.spacesId, //spaces id
       [Query.equal('creatorId', creatorId)]
     );
 
@@ -148,8 +148,8 @@ export const getSpacesByCreatorId = async (creatorId: string) => {
 export const getVideosBySpaceID = async (spaceId:string) => {
   try {
     const response = await databases.listDocuments(
-      databaseId,
-      videoCollectionId,
+      appwriteConfig.databaseId,
+      appwriteConfig.videoCollectionId,
       [Query.equal('spaceId',spaceId)]
     );
     console.log("successfully fetched videos for the id");
