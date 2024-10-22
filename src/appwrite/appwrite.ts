@@ -1,9 +1,8 @@
 import { Client, Account, OAuthProvider, Databases, ID, Query, Storage } from "appwrite";
 import { appwriteConfig } from "./config";
+import crypto from 'crypto';
 
 export const client = new Client();
-
-
 
 client
   .setEndpoint(appwriteConfig.endpoint)
@@ -21,6 +20,15 @@ export async function uploadFile(file: File) {
     console.error('Error uploading file:', error);
   }
 }
+
+export const generateInviteToken = () => {
+  return crypto.randomBytes(16).toString('hex'); 
+};
+
+export const createInviteLink = (token: string, spaceId: string) => {
+  const baseUrl = 'http://localhost:3000/validate'; 
+  return `${baseUrl}?token=${token}&spaceId=${spaceId}`; 
+};
 
 export async function uploadVideoWithThumbnail(
   creatorId: string,
@@ -159,49 +167,78 @@ export const getVideosBySpaceID = async (spaceId:string) => {
   }
 }
 
+export const createInviteDocument = async (groupId: string, token: string) => {
+  const expirationTime = new Date(Date.now() + 30 * 60 * 1000);
 
-// export const loginWithGoogle = async () => {
-//   try {
-//       await account.createOAuth2Session(
-//       OAuthProvider.Google,
-//       'http://localhost:3000/home',
-//       'http://localhost:3000/fail',
-//       ['email', 'profile', 'openid']
-//     )
+  const inviteData = {
+    token: token,
+    groupId: groupId,
+    status: false,
+    expiration: expirationTime.toISOString(),
+  };
 
-//   } catch (error) {
-//     console.error('OAuth login error:', error);
-//   }
-// }
+  await databases.createDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.collabsCollectionId,
+    token,
+    inviteData
+  );
 
-// export const logoutUser = async () => {
-//   try {
-//     await account.deleteSession('current')
-//   } catch (error) {
-//     console.error(error)
-//   }
-// }
+};
 
-// export const getUser = async () => {
-//   try {
-//     return await account.get()
-//   } catch (error) {
-//     console.error(error)
-//   }
-// }
+export const getInviteByToken = async (token: string) => {
+  try {
+    const response = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.collabsCollectionId,
+      [Query.equal('token', token)]
+    );
 
-// export const getCurrentSession = async () => {
-//   try {
-//     const session = await account.getSession('current');
-//     console.log('Provider:', session.provider);
-//     console.log('Provider UID:', session.providerUid);
-//     console.log('Provider Access Token:', session.providerAccessToken);
-//     return session;
-//   } catch (error) {
-//     console.error("Error fetching session:", error);
-//     return null;
-//   }
-// };
+    if (response.total > 0) {
+      return response.documents[0]; // Return the first invite document found
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching invite by token:', error);
+    throw error; // Handle error appropriately
+  }
+};
+
+const getSpaceById = async (spaceId: string) => {
+  try {
+    const response = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.spacesId,
+      spaceId
+    );
+
+    return response;
+  } catch (error) {
+    console.error('Error fetching space by ID:', error);
+    throw error;
+  }
+}
+
+export const updateCollaborators = async (spaceId: string, email: string) => {
+  const space = await getSpaceById(spaceId); 
+
+  if (space.collaborators.includes(email)) {
+    throw new Error('User already a collaborator');
+  }
+
+  const updatedCollaborators = [...space.collaborators, email];
+
+  await databases.updateDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.spacesId,
+    spaceId,
+    {
+      collaborators: updatedCollaborators,
+    }
+  );
+};
+
+
 
 export { ID } from 'appwrite';
 export { OAuthProvider } 

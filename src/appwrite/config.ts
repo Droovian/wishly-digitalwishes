@@ -6,5 +6,6 @@ export const appwriteConfig = {
     videoCollectionId: '671099c3003764136a39',
     bucketId: '6715256f0020032941dd',
     spacesId: '671649b1000dbb880375',
+    collabsCollectionId: '6717bb8200017102d342'
 
 }
