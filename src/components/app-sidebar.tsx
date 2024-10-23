@@ -19,7 +19,7 @@ import { useRouter } from 'next/navigation';
 const items = [
   {
     title: "Home",
-    url: "#",
+    url: "/",
     icon: Home,
   },
   {
@@ -27,11 +27,7 @@ const items = [
     url: "/dashboard",
     icon: Inbox,
   },
-  {
-    title: "View my Groups",
-    url: "/groups",
-    icon: Calendar,
-  }
+  
   
 ]
 
@@ -40,10 +36,8 @@ export function AppSidebar() {
     const router = useRouter();
 
   return (
-    <Sidebar variant="sidebar">
-        <SidebarHeader>
-            Welcome
-        </SidebarHeader>
+    <Sidebar variant="inset" className="mt-20">
+        
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>

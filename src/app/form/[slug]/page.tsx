@@ -3,6 +3,8 @@ import Image from "next/image"
 import BirthdayParty from '@/public/images/birthdaygroup.jpeg'
 import HouseParty from "@/public/images/housepartynew.jpeg"
 import Date from "@/public/images/datenew.jpeg"
+import { Suspense } from "react"
+import FormLoader from "@/components/skeletons/form-loader"
 
 export default function Page({ params }: { params: { slug: string}}){
 
@@ -31,9 +33,11 @@ export default function Page({ params }: { params: { slug: string}}){
                     className="rounded-md"
                 />
             </div>
-            <div className="">
-                <InviteForm/>
-            </div>
+            <Suspense fallback={<FormLoader/>}>
+                <div className="">
+                    <InviteForm/>
+                </div>
+            </Suspense>
             
         </div>
     )

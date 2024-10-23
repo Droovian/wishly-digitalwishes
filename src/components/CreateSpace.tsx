@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { createVideoSpace,getSpacesByCreatorId } from "@/appwrite/appwrite";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -21,6 +21,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 // Updated schema to include creator's name
 const spaceSchema = z.object({
   name: z.string().min(5, { message: "Title must be at least 5 characters." }),
@@ -32,6 +35,7 @@ type SpaceFormData = z.infer<typeof spaceSchema>;
 
 const CreateSpace = () => {
   const { user } = useUser();
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
   const form = useForm<SpaceFormData>({
     resolver: zodResolver(spaceSchema),
@@ -46,17 +50,24 @@ const CreateSpace = () => {
   const onSubmit = async (data: SpaceFormData) => {
 
     try {
+      setLoading(true);
       const response = await createVideoSpace(data,user!.id);
-      alert("successfully created a space")
+      setLoading(false);
       router.push("/dashboard")
       console.log("Video space created:", response);
     } catch (error) {
+      setLoading(false);
       console.error("Error submitting form:", error);
+      toast.error("Error creating video space.");
     }
   };
 
   return (
     <Card className="w-3/4 sm:w-1/2">
+      <ToastContainer
+      position="top-center"
+      autoClose={3000}
+      />
       <CardHeader className="text-center">
         <CardTitle>Create your own video space!</CardTitle>
       </CardHeader>
@@ -110,7 +121,7 @@ const CreateSpace = () => {
             />
 
             {/* Submit Button */}
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={loading}>
               Create a space
             </Button>
           </form>

@@ -17,8 +17,8 @@ const Navbar = () => {
             <button onClick={() => {router.back()}} className='font-bold text-xl sm:text-3xl text-[#000000]'>Wishly</button>
             <div className='invisible sm:visible border rounded-xl p-3'>
                 <ul className='flex font-bold text-gray-600 text-sm space-x-4 mx-10'>
-                    <Link href={"/create"} className='hover:text-gray-800'>Create Video Invite</Link>
-                    <Link href={"/contact"} className='hover:text-gray-800'>Reach out</Link>
+                    <Link href={"/create"} className='hover:text-gray-800'>Start a space</Link>
+                    <Link href={"/contact"} className='hover:text-gray-800'>about</Link>
                 </ul>
             </div>
             <div className="flex items-center">
