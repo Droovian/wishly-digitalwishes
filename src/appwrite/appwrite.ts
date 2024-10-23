@@ -30,6 +30,10 @@ export const createInviteLink = (token: string, spaceId: string) => {
   return `${baseUrl}?token=${token}&spaceId=${spaceId}`; 
 };
 
+const MAX_VIDEOS_PER_SPACE = 4;
+const MAX_VIDEO_SIZE_MB = 100;
+const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024;
+
 export async function uploadVideoWithThumbnail(
   creatorId: string,
   title: string,
@@ -38,6 +42,20 @@ export async function uploadVideoWithThumbnail(
 ) {
   try {
     let videoResponse, fileUrl;
+
+    if(videoFile.size > MAX_VIDEO_SIZE_BYTES) {
+      throw new Error('Video file size exceeds the limit of 100MB.');
+    }
+
+    const existingVideos = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.videoCollectionId,
+      [Query.equal("spaceId", spaceId)]
+    );
+
+    if (existingVideos.documents.length >= MAX_VIDEOS_PER_SPACE) {
+      throw new Error("Video limit for this space has been reached (4 videos max).");
+    }
 
     videoResponse = await storage.createFile(appwriteConfig.bucketId, ID.unique(), videoFile);
 
@@ -51,7 +69,7 @@ export async function uploadVideoWithThumbnail(
         title,
         video: fileUrl,
         creatorId,
-        spaceId, //please take care of the space id as well here
+        spaceId: spaceId,
       }
     );
 
@@ -234,9 +252,52 @@ export const updateCollaborators = async (spaceId: string, email: string) => {
     spaceId,
     {
       collaborators: updatedCollaborators,
+      status: true,
     }
   );
 };
+
+export const getVideosBySpaceId = async (spaceId: string) => {
+  try {
+    const response = await databases.listDocuments(appwriteConfig.databaseId, appwriteConfig.videoCollectionId, [
+      Query.equal('spaceId', spaceId) 
+    ]);
+    return response.documents;
+  } catch (error) {
+    console.error(`Error fetching videos: ${error}`);
+    throw error; 
+  }
+};
+
+
+export const deleteSpace = async (spaceId: string) => {
+  try {
+    const videos = await getVideosBySpaceId(spaceId); // Ensure function name matches
+
+    if (videos && videos.length >= 0) {
+      await Promise.all(videos.map(video => {
+        const videoId = video.$id; 
+        return databases.deleteDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.videoCollectionId,
+          videoId
+        );
+      }));
+    }
+
+    await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.spacesId,
+      spaceId
+    );
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting space:', error);
+    throw new Error('Could not delete space. Please try again later.');
+  }
+};
+
 
 
 

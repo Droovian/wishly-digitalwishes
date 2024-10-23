@@ -1,19 +1,22 @@
-"use client";
-import { useRouter, useParams } from 'next/navigation';
-import { useEffect } from 'react';
+import VideoUploadForm from "@/components/VideoForm";
 
-const SpaceDetails = ({ params }: { params: { spaceId: string } }) => {
+export default function SpaceDetails ({ params }: { params: { spaceId: string } }) {
+  
   const spaceId = params.spaceId;
-  useEffect(() => {
-    console.log(`Space ID: ${spaceId}`); 
-  }, [spaceId]);
-
+  
+  if(!spaceId) {
+    return (
+      <div className='p-5 flex justify-center items-center'>
+          <h1>Space not found</h1>
+      </div>
+    );
+  }
+  
   return (
-    <div>
-      <h1>Space Details</h1>
-      <p>Space ID: {spaceId}</p>
+    <div className='p-5 flex justify-center items-center'>
+        <VideoUploadForm spaceId={spaceId} />
     </div>
   );
 };
 
-export default SpaceDetails;
+

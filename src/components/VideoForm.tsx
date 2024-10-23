@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
-
+import { ToastContainer, toast } from "react-toastify";
 import {
   Form,
   FormControl,
@@ -29,6 +29,7 @@ const videoSchema = z.object({
 });
 
 type VideoFormData = z.infer<typeof videoSchema>;
+
 interface VideoProps {
  spaceId:string ,
 }
@@ -36,6 +37,7 @@ interface VideoProps {
 const VideoUploadForm: React.FC<VideoProps> = ({ spaceId }) =>  {
 
   const { userId } = useAuth();
+  
   const form = useForm<VideoFormData>({
     resolver: zodResolver(videoSchema),
     defaultValues: {
@@ -56,15 +58,21 @@ const VideoUploadForm: React.FC<VideoProps> = ({ spaceId }) =>  {
       }
       
       if(data.video && data.title){
-        const response = await uploadVideoWithThumbnail(userId, data.title, data.video,spaceId); //fix this 
+        const response = await uploadVideoWithThumbnail(userId, data.title, data.video, spaceId); 
         console.log('Video data successfully stored in Appwrite:', response);
       }
       else{
         console.log('An error occured while uploading video');
         
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting form:", error);
+      if(error.message.includes("Video limit")){
+        toast.error("You cannot upload more than 4 videos to this space.");
+      }
+      else{
+        toast.error("An error occurred while uploading video.");
+      }
     }
   };
 
@@ -75,6 +83,11 @@ const VideoUploadForm: React.FC<VideoProps> = ({ spaceId }) =>  {
 
   return (
     <Card className="w-3/4 sm:w-1/2">
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        closeOnClick
+      />
       <CardHeader>
         <CardTitle>Create a custom video message</CardTitle>
       </CardHeader>

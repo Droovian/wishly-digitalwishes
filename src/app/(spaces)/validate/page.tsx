@@ -4,65 +4,78 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getInviteByToken, updateCollaborators } from '@/appwrite/appwrite'; // Import the function to update collaborators
 import { useUser } from '@clerk/nextjs';
+import VideoUploadForm from '@/components/VideoForm';
+import { toast ,ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Validate() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
-  const spaceId = searchParams.get('spaceId');
+  const spaceId = searchParams.get('spaceId')!;
   const { user, isLoaded } = useUser();
   
   const [message, setMessage] = useState<string>('');
+  const [isCollaborator, setIsCollaborator] = useState(false); // State to track if the user is a collaborator
 
   useEffect(() => {
     const verifyToken = async () => {
       if (!token || !spaceId) {
-        setMessage('No token/spaceid provided.');
+        setMessage('No token/spaceId provided.');
         return;
       }
 
       if (!isLoaded || !user) {
-        // Wait until user data is loaded
         return;
       }
 
       try {
         const inviteData = await getInviteByToken(token);
 
-        console.log('Invite data:', inviteData);
-        
         if (!inviteData) {
-          setMessage('Invalid invitation token.');
+          toast('Invalid invitation token.');
         } else {
           const currentTime = new Date();
           const expirationTime = new Date(inviteData.expiration);
 
           if (currentTime > expirationTime) {
-            setMessage('This invitation link has expired.');
+            toast('This invitation link has expired.');
           } else {
-            setMessage('Token is valid. Welcome!');
-            // Add user email to collaborators array
-             await updateCollaborators(spaceId, user.emailAddresses[0].emailAddress); // Assuming inviteData contains spaceId
-            setMessage('You have been added as a collaborator!');
+            toast('Token is valid. Welcome!');
+
+            // Try to add the user as a collaborator
+            try {
+              await updateCollaborators(spaceId, user.emailAddresses[0].emailAddress);
+              toast('You have been added as a collaborator!');
+              setIsCollaborator(true); // Set collaborator state to true
+            } catch (error: any) {
+              if (error.message === 'User already a collaborator') {
+                toast('You are already a collaborator on this space.'); // Set specific message for this case
+              } else {
+                toast('Error adding you as a collaborator. Please try again.');
+              }
+            }
           }
         }
       } catch (error) {
         console.error('Error verifying token:', error);
-        setMessage('Error verifying the invitation link.');
+        toast('Error verifying the invitation link.');
       }
     };
 
     verifyToken();
-  }, [token, user, isLoaded]); // Add isLoaded to the dependency array
+  }, [token, user, isLoaded]);
 
-  // Render loading state
   if (!isLoaded) {
     return <div>Loading user data...</div>;
   }
 
   return (
-    <div>
+    <div className='flex justify-center items-center'>
+      <ToastContainer
+        position='top-center'
+      />
       <h1>Invite</h1>
-      <p>{message}</p>
+      {isCollaborator && <VideoUploadForm spaceId={spaceId} />} 
     </div>
   );
 }
