@@ -4,10 +4,6 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import Confetti from 'react-confetti';
 import { custom } from "zod";
-import { useReward } from 'react-rewards';
-
-const {reward: confettiReward, isAnimating: isConfettiAnimating} = useReward('confettiReward', 'confetti');
-const {reward: balloonsReward, isAnimating: isBalloonsAnimating} = useReward('balloonsReward', 'balloons');
 
 const Envelope: React.FC<{ invitation: InvitationDetail }> = ({ invitation }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -74,8 +70,6 @@ const Envelope: React.FC<{ invitation: InvitationDetail }> = ({ invitation }) =>
 
   return (
     <div className="flex justify-center items-center h-screen bg-white">
-      <span id="confettiReward" />
-      <span id="balloonsReward" />
       {showConfetti && <Confetti />}
       <motion.div
         initial={{ x: -1000, scale: 1 }}
@@ -95,9 +89,8 @@ const Envelope: React.FC<{ invitation: InvitationDetail }> = ({ invitation }) =>
         {/* Main Envelope Container */}
         <motion.div
           className="relative w-[600px] h-[350px] cursor-pointer"
-          onClick={() => {
-            balloonsReward();
-        }}          whileHover={{ scale: 1.02 }}
+          onClick={handleClick}
+          whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.2 }}
         >
           {/* Base/Bottom of envelope */}
