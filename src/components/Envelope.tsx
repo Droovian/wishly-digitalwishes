@@ -1,9 +1,15 @@
 'use client';
+import { InvitationDetail } from "@/lib/data";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Confetti from 'react-confetti';
+import { custom } from "zod";
+import { useReward } from 'react-rewards';
 
-export default function Envelope() {
+const {reward: confettiReward, isAnimating: isConfettiAnimating} = useReward('confettiReward', 'confetti');
+const {reward: balloonsReward, isAnimating: isBalloonsAnimating} = useReward('balloonsReward', 'balloons');
+
+const Envelope: React.FC<{ invitation: InvitationDetail }> = ({ invitation }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   
@@ -25,7 +31,15 @@ export default function Envelope() {
       }
     }
   };
-
+  const InviteData : InvitationDetail = {
+    hostName :  invitation.hostName,
+    inviteeName : invitation.inviteeName,
+    eventDate : invitation.eventDate,
+    eventTime : invitation.eventTime,
+    customMessage : invitation.customMessage,
+    location: invitation.location,
+    template : invitation.template
+  }
   const letterVariants = {
     closed: { 
       y: 0,
@@ -60,6 +74,8 @@ export default function Envelope() {
 
   return (
     <div className="flex justify-center items-center h-screen bg-white">
+      <span id="confettiReward" />
+      <span id="balloonsReward" />
       {showConfetti && <Confetti />}
       <motion.div
         initial={{ x: -1000, scale: 1 }}
@@ -79,8 +95,9 @@ export default function Envelope() {
         {/* Main Envelope Container */}
         <motion.div
           className="relative w-[600px] h-[350px] cursor-pointer"
-          onClick={handleClick}
-          whileHover={{ scale: 1.02 }}
+          onClick={() => {
+            balloonsReward();
+        }}          whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.2 }}
         >
           {/* Base/Bottom of envelope */}
@@ -122,13 +139,13 @@ export default function Envelope() {
             <div className="text-center space-y-4">
               <h2 className="text-3xl font-bold text-gray-800">You're Invited!</h2>
               <p className="text-lg text-gray-600">
-                Join us for a special celebration
+                {InviteData.customMessage}
               </p>
               <div className="pt-4">
                 <p className="text-gray-700">
-                  Saturday, December 31st, 2024<br />
-                  7:00 PM<br />
-                  The Grand Ballroom
+                  {InviteData.eventDate}<br />
+                  {InviteData.eventTime}<br />
+                  {InviteData.location}
                 </p>
               </div>
               <div className="pt-4">
@@ -159,3 +176,5 @@ export default function Envelope() {
     </div>
   );
 }
+
+export default Envelope
