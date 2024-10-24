@@ -1,5 +1,5 @@
 import { getInviteByDocumentId } from "@/appwrite/appwrite";
-
+import BookInvitation from "@/components/invitations/BookInvitation";
 export default async function Invites({ params }: { params: { id: string } }) {
 
     const invite = await getInviteByDocumentId(params.id);
@@ -13,9 +13,8 @@ export default async function Invites({ params }: { params: { id: string } }) {
     
 
     return (
-        <div className="flex flex-col justify-center items-center h-screen">
-            <p>{invite.hostName}</p>
-            <p>{invite.customMessage}</p>
+        <div className="">
+            <BookInvitation/>
         </div>
     )
 }
