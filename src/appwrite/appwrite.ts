@@ -222,6 +222,46 @@ export const getInviteByToken = async (token: string) => {
   }
 };
 
+export const createInvite = async (inviteData: {
+  hostName: string;
+  inviteeName?: string;
+  customMessage: string;
+  eventDate: string;
+  eventTime?: string;
+  location?: string;
+  template: string;
+  userId: string
+}) => {
+  try {
+    console.log(inviteData.userId);
+    const response = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.invitesCollectionId,
+      ID.unique(), 
+      inviteData
+    );
+    console.log("Invitation successfully created:", response);
+    return response;
+  } catch (error) {
+    console.error("Error creating invitation:", error);
+    throw error; 
+  }
+};
+
+export const getInvitesByUserId = async (userId: string) => {
+  try {
+    const response = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.invitesCollectionId,
+      [Query.equal('userId', userId)]
+    );
+    return response.documents;
+  } catch (error) {
+    console.error('Error fetching invites:', error);
+    throw error;
+  }
+}
+
 const getSpaceById = async (spaceId: string) => {
   try {
     const response = await databases.getDocument(
@@ -256,6 +296,21 @@ export const updateCollaborators = async (spaceId: string, email: string) => {
     }
   );
 };
+
+export const getInviteByDocumentId = async (documentId: string) => {
+  try {
+    const response = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.invitesCollectionId,
+      documentId
+    );
+
+    return response;
+  } catch (error) {
+    console.error('Error fetching invite by document ID:', error);
+    throw error;
+  }
+}
 
 export const getVideosBySpaceId = async (spaceId: string) => {
   try {

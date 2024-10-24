@@ -1,7 +1,8 @@
 'use client'
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useState } from "react"
+import { set, useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
@@ -23,7 +24,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
+import { useUser } from "@clerk/nextjs"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import { createInvite } from "@/appwrite/appwrite"
 const inviteSchema = z.object({
   hostName: z.string().min(2, { message: "Host name must be at least 2 characters." }),
   inviteeName: z.string().optional(),
@@ -37,6 +41,8 @@ const inviteSchema = z.object({
 type InviteFormData = z.infer<typeof inviteSchema>
 
 export default function InviteForm() {
+  const { user } = useUser();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = useForm<InviteFormData>({
     resolver: zodResolver(inviteSchema),
     defaultValues: {
@@ -51,16 +57,36 @@ export default function InviteForm() {
   })
 
   const onSubmit = async (data: InviteFormData) => {
+    if(!user){
+      toast.error("You must be logged in to create an invitation.")
+      return
+    }
+
+    const inviteData = {
+      ...data,
+      userId: user.id,
+    }
+
     try {
+      setIsLoading(true);
       console.log("Form Data Submitted:", data)
-      // Perform API call or state update here
+      
+      await createInvite(inviteData);
+      toast.success("Invitation created successfully.")
+      setIsLoading(false);
+      form.reset()
+      
     } catch (error) {
-      console.error("Error submitting form:", error)
+      setIsLoading(false);
+      toast.error("Error creating invitation.")
     }
   }
 
   return (
     <Card className="w-full max-w-2xl mx-auto h-full">
+      <ToastContainer 
+        position="top-center"
+      />
       <CardHeader>
         <CardTitle>Create Digital Invite</CardTitle>
       </CardHeader>
@@ -123,9 +149,9 @@ export default function InviteForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="birthday">Modern</SelectItem>
-                      <SelectItem value="party">Retro</SelectItem>
-                      <SelectItem value="anniversary">Comic book</SelectItem>
+                      <SelectItem value="Modern">Modern</SelectItem>
+                      <SelectItem value="Retro">Retro</SelectItem>
+                      <SelectItem value="Comic">Comic book</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription>Select the look and feel of your invite.</FormDescription>
@@ -176,7 +202,7 @@ export default function InviteForm() {
               )}
             />
 
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={isLoading}>
               Generate Invitation
             </Button>
           </form>

@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
 import React, { useEffect, useState } from 'react'
-import { createInviteDocument, generateInviteToken, getSpacesByCreatorId, createInviteLink, deleteSpace } from '@/appwrite/appwrite'
+import { createInviteDocument, generateInviteToken, getSpacesByCreatorId, createInviteLink, deleteSpace, getInvitesByUserId } from '@/appwrite/appwrite'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import { Plus, Mail, Copy, X, Trash } from 'lucide-react'
@@ -14,36 +14,65 @@ import { useClipboard } from 'use-clipboard-copy'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-interface Invitation {
-  id: number
-  title: string
-  date: string
-}
+type Invitation = {
+  $id: string;
+  hostName: string;
+  inviteeName: string;
+  customMessage: string;
+  eventDate: Date;
+  eventTime?: Date;
+  location: string;
+  template: 'Modern' | 'Retro' | 'Comic';  
+  userId: string;
+};
 
 export default function Dashboard() {
   const { user, isLoaded } = useUser()
   const router = useRouter()
   const clipboard = useClipboard()
   const [loading, setLoading] = useState(true)
-  const [invitations, setInvitations] = useState<Invitation[]>([
-    { id: 1, title: "Birthday Party", date: "2024-05-15" },
-    { id: 2, title: "Wedding Anniversary", date: "2024-06-20" },
-  ])
+  const [invitations, setInvitations] = useState<Invitation[]>([])
   const [videoGroups, setVideoGroups] = useState<any[]>([])
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [currentLink, setCurrentLink] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [linkType, setLinkType] = useState<string>('')  // To track which type of link is open
+  const [currentLink, setCurrentLink] = useState<string>('')
+
+  const formInviLink = (InviteId: string) => {
+    const invitationLink = `http://localhost:3000/invites/${InviteId}`;
+    setCurrentLink(invitationLink);
+    setLinkType('invitation');
+    setIsModalOpen(true);
+  }
 
   const createCollabLink = async (groupId: string) => {
     const inviteToken = generateInviteToken()
     await createInviteDocument(groupId, inviteToken)
     const generatedInviteLink = createInviteLink(inviteToken, groupId)
     setCurrentLink(generatedInviteLink)
+    setLinkType('collaboration');
     setIsModalOpen(true)
+  }
+
+  const fetchInvitations = async () => {
+    if (!user) {
+      toast('Log in to view invitations')
+      return
+    }
+    try {
+      const response: any = await getInvitesByUserId(user.id)
+      if (response) {
+        setInvitations(response)
+      } else {
+        setInvitations([])
+      }
+    } catch (error) {
+      console.error(`Encountered an error fetching invitations: ${error}`)
+    }
   }
 
   const copyToClipboard = () => {
     clipboard.copy(currentLink)
-    toast.success("Invite link copied to clipboard!")
+    toast.success(`${linkType === 'invitation' ? 'Invitation' : 'Collaboration'} link copied to clipboard!`)
   }
 
   const handleDeleteSpace = async (spaceId: string) => {
@@ -52,7 +81,6 @@ export default function Dashboard() {
         await deleteSpace(spaceId);
         setVideoGroups(prevGroups => prevGroups.filter(group => group.$id !== spaceId));
         toast.success('Space deleted successfully!');
-       
       } catch (error: any) {
         toast.error(error.message || 'Failed to delete space.');
       }
@@ -84,6 +112,13 @@ export default function Dashboard() {
     if (isLoaded) fetchSpaces()
   }, [user, isLoaded])
 
+  useEffect(() => {
+    if (isLoaded) {
+      fetchInvitations();
+    }
+  }, [user, isLoaded]);
+
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">My Digital Creations</h1>
@@ -103,13 +138,15 @@ export default function Dashboard() {
         <TabsContent value="invitations">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {invitations.map((invitation) => (
-              <Card key={invitation.id}>
+              <Card key={invitation.$id}>
                 <CardHeader>
-                  <CardTitle>{invitation.title}</CardTitle>
-                  <CardDescription>Date: {invitation.date}</CardDescription>
+                  <CardTitle>{invitation.$id}</CardTitle>
+                  <CardTitle>{invitation.hostName}</CardTitle>
                 </CardHeader>
                 <CardFooter>
-                  <Button variant="outline"><Mail className="mr-2 h-4 w-4" /> Send</Button>
+                  <Button variant="outline" onClick={() => formInviLink(invitation?.$id)}>
+                    <Mail className="mr-2 h-4 w-4" /> Send
+                  </Button>
                 </CardFooter>
               </Card>
             ))}
@@ -135,7 +172,9 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="flex space-x-2">
-                        <Button variant="outline" onClick={() => createCollabLink(group.$id)}>Create Collab Link</Button>
+                        <Button variant="outline" onClick={() => createCollabLink(group.$id)}>
+                          Create Collab Link
+                        </Button>
                         <Button variant="outline" onClick={() => { router.push(`/space/${group.$id}`) }}>Add Video</Button> 
                         <Button variant="destructive" onClick={() => handleDeleteSpace(group.$id)}>
                           <Trash className="mr-2 h-4 w-4" /> Delete
@@ -160,9 +199,9 @@ export default function Dashboard() {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Collaboration Link</DialogTitle>
+            <DialogTitle>{linkType === 'invitation' ? 'Invitation Link' : 'Collaboration Link'}</DialogTitle>
             <DialogDescription>
-              Share this link with those you'd like to collaborate with.
+              Share this link with those you'd like to {linkType === 'invitation' ? 'invite' : 'collaborate'} with.
             </DialogDescription>
           </DialogHeader>
           <div className="flex items-center space-x-2">
