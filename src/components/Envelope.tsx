@@ -4,11 +4,17 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import Confetti from 'react-confetti';
 import { custom } from "zod";
-
+import drawShapes from "../components/templates/confetticonfig"; // Combined import
 const Envelope: React.FC<{ invitation: InvitationDetail }> = ({ invitation }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   
+  const shapeMap = {
+    heart: drawShapes.drawHeart,
+    smiley: drawShapes.drawSmiley,
+    balloon: drawShapes.drawBalloon,
+    default: drawShapes.drawDefaultShape,
+  };
   const topFlapVariants = {
     closed: { 
       rotateX: 0,
@@ -70,7 +76,13 @@ const Envelope: React.FC<{ invitation: InvitationDetail }> = ({ invitation }) =>
 
   return (
     <div className="flex justify-center items-center h-screen bg-white">
-      {showConfetti && <Confetti />}
+      {showConfetti && <Confetti
+       width={typeof window !== 'undefined' ? window.innerWidth : 300}
+       height={typeof window !== 'undefined' ? window.innerHeight : 200}
+       recycle={false}
+       numberOfPieces={200}
+       drawShape={shapeMap.heart} // Use the selected shape
+       colors={['#FF69B4', '#FF1493', '#C71585', '#DB7093']} />}
       <motion.div
         initial={{ x: -1000, scale: 1 }}
         animate={{
