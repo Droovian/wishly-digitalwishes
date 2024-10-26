@@ -292,7 +292,6 @@ export const updateCollaborators = async (spaceId: string, email: string) => {
     spaceId,
     {
       collaborators: updatedCollaborators,
-      status: true,
     }
   );
 };

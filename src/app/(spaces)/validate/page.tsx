@@ -5,8 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import { getInviteByToken, updateCollaborators } from '@/appwrite/appwrite'; // Import the function to update collaborators
 import { useUser } from '@clerk/nextjs';
 import VideoUploadForm from '@/components/VideoForm';
-import { toast ,ToastContainer} from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 export default function Validate() {
   const searchParams = useSearchParams();
@@ -32,33 +30,33 @@ export default function Validate() {
         const inviteData = await getInviteByToken(token);
 
         if (!inviteData) {
-          toast('Invalid invitation token.');
+          setMessage('Invalid invitation token.');
         } else {
           const currentTime = new Date();
           const expirationTime = new Date(inviteData.expiration);
 
           if (currentTime > expirationTime) {
-            toast('This invitation link has expired.');
+            setMessage('This invitation link has expired.');
           } else {
-            toast('Token is valid. Welcome!');
+            setMessage('Token is valid. Welcome!');
 
             // Try to add the user as a collaborator
             try {
               await updateCollaborators(spaceId, user.emailAddresses[0].emailAddress);
-              toast('You have been added as a collaborator!');
+              setMessage('You have been added as a collaborator!');
               setIsCollaborator(true); // Set collaborator state to true
             } catch (error: any) {
               if (error.message === 'User already a collaborator') {
-                toast('You are already a collaborator on this space.'); // Set specific message for this case
+                setMessage('You are already a collaborator on this space.'); // Set specific message for this case
               } else {
-                toast('Error adding you as a collaborator. Please try again.');
+                setMessage('Error adding you as a collaborator. Please try again.');
               }
             }
           }
         }
       } catch (error) {
         console.error('Error verifying token:', error);
-        toast('Error verifying the invitation link.');
+        setMessage('Error verifying the invitation link.');
       }
     };
 
@@ -71,10 +69,8 @@ export default function Validate() {
 
   return (
     <div className='flex justify-center items-center'>
-      <ToastContainer
-        position='top-center'
-      />
       <h1>Invite</h1>
+      {message && <p>{message}</p>}
       {isCollaborator && <VideoUploadForm spaceId={spaceId} />} 
     </div>
   );
