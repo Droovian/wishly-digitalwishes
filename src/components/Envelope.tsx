@@ -5,8 +5,11 @@ import { useState } from "react";
 import Confetti from 'react-confetti';
 import drawShapes from "../components/templates/confetticonfig"; // Combined import
 import Letter from "./Letter";
-
-const Envelope: React.FC<{ invitation: InvitationDetail }> = ({ invitation }) => {
+interface EnvelopeProps{
+  invitation:InvitationDetail
+  inviteId:string
+}
+const Envelope: React.FC<EnvelopeProps> = ({ invitation,inviteId }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [letterVisible, setLetterVisible] = useState(false); // State for letter visibility
@@ -49,7 +52,7 @@ const Envelope: React.FC<{ invitation: InvitationDetail }> = ({ invitation }) =>
         ease: "easeOut"
       }
     }
-  };
+  }
 
   const letterVariants = {
     closed: { 
@@ -79,10 +82,16 @@ const Envelope: React.FC<{ invitation: InvitationDetail }> = ({ invitation }) =>
       
       // Set a timeout to fade out the envelope after showing the letter
       setTimeout(() => {
-        setShowConfetti(false);
-      }, 5000); 
+        setShowConfetti(false)
+      }, 5000)
     }
+  }
+
+  const handleFormClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
+
+  
 
   return (
     <div className="flex justify-center items-center h-screen bg-white">
@@ -159,7 +168,7 @@ const Envelope: React.FC<{ invitation: InvitationDetail }> = ({ invitation }) =>
               animate={isOpen ? "open" : "closed"}
               className="absolute top-10 left-10 right-10" // Fixed positioning to maintain size
             >
-              <Letter invitation={invitation} isOpen = {isOpen} />
+              <Letter invitation={invitation} isOpen = {isOpen} inviteId={ inviteId}/>
             </motion.div>
           </motion.div>
 
