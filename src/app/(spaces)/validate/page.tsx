@@ -5,13 +5,14 @@ import { useSearchParams } from 'next/navigation';
 import { getInviteByToken, updateCollaborators } from '@/appwrite/appwrite'; // Import the function to update collaborators
 import { useUser } from '@clerk/nextjs';
 import VideoUploadForm from '@/components/VideoForm';
+import { useRouter } from 'next/navigation';
 
 export default function Validate() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const spaceId = searchParams.get('spaceId')!;
   const { user, isLoaded } = useUser();
-  
+  const router = useRouter();
   const [message, setMessage] = useState<string>('');
   const [isCollaborator, setIsCollaborator] = useState(false); // State to track if the user is a collaborator
 
@@ -43,13 +44,17 @@ export default function Validate() {
             // Try to add the user as a collaborator
             try {
               await updateCollaborators(spaceId, user.emailAddresses[0].emailAddress);
-              setMessage('You have been added as a collaborator!');
+              alert('You have been added as a collaborator!');
+              router.push('/dashboard')
               setIsCollaborator(true); // Set collaborator state to true
             } catch (error: any) {
               if (error.message === 'User already a collaborator') {
-                setMessage('You are already a collaborator on this space.'); // Set specific message for this case
+                setIsCollaborator(true)
+                alert('You are already a collaborator on this space.'); // Set specific message for this case
+                router.push('/dashboard')
               } else {
                 setMessage('Error adding you as a collaborator. Please try again.');
+                router.push('/sign-in')
               }
             }
           }
@@ -69,9 +74,8 @@ export default function Validate() {
 
   return (
     <div className='flex justify-center items-center'>
-      <h1>Invite</h1>
-      {message && <p>{message}</p>}
-      {isCollaborator && <VideoUploadForm spaceId={spaceId} />} 
+      <h1>Please wait till we verify the entered token..</h1>
+      {/* {isCollaborator && <VideoUploadForm spaceId={spaceId} />}  */}
     </div>
   );
 }
