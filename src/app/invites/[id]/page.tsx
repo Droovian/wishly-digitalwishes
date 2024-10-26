@@ -13,7 +13,7 @@ export default async function Invites({ params }: { params: { id: string } }) {
 
     return (
         <div className="">
-            <AnimatedEnvelope/>
+            <AnimatedEnvelope inviteId={params.id}/>
         </div>
     )
 }

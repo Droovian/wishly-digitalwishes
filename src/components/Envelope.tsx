@@ -1,60 +1,89 @@
-'use client';
-import { motion } from "framer-motion";
-import { useState } from "react";
-import Confetti from 'react-confetti';
+"use client"
 
-export default function Envelope() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
+import { motion } from "framer-motion"
+import { useState } from "react"
+import Confetti from 'react-confetti'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { addToRsvpList } from "@/appwrite/appwrite"
+
+export default function Envelope({ inviteId }: { inviteId: string }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
+  const [name, setName] = useState("")
+  const [isRsvpSubmitted, setIsRsvpSubmitted] = useState<boolean>(false)
   
   const topFlapVariants = {
     closed: { 
       rotateX: 0,
       y: 0,
       originY: 0,
-      translateZ: 0, // No translation when closed
+      translateZ: 0,
     },
     open: { 
       rotateX: -180,
       y: 0,
       originY: 0,
-      translateZ: 10, // Add depth when opening
+      translateZ: 10,
       transition: {
         duration: 1.0,
         ease: "easeOut"
       }
     }
-  };
+  }
 
   const letterVariants = {
     closed: { 
       y: 0,
       opacity: 0,
       scale: 0.8,
-      z: -1 // Ensure the card is behind the flap when closed
+      z: -1
     },
     open: { 
       y: -160,
       opacity: 1,
       scale: 1,
-      z: 1, // Bring the card to the front when open
+      z: 1,
       transition: {
         delay: 0.3,
         duration: 0.5,
         ease: "easeOut"
       }
     }
-  };
+  }
 
   const handleClick = () => {
     if (isOpen) {
-      setIsOpen(false);
+      setIsOpen(false)
     } else {
-      setIsOpen(true);
-      setShowConfetti(true);
+      setIsOpen(true)
+      setShowConfetti(true)
       setTimeout(() => {
-        setShowConfetti(false);
-      }, 5000); 
+        setShowConfetti(false)
+      }, 5000)
+    }
+  }
+
+  const handleFormClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  const handleRsvp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!name.trim()) {
+      alert("Please enter your name to RSVP.");
+      return;
+    }
+
+    try {
+      await addToRsvpList(inviteId, name);
+      setIsRsvpSubmitted(true);
+      alert(`Thank you for your RSVP, ${name}!`);
+    } catch (error) {
+      alert("Error submitting RSVP. Please try again.");
+      console.error("RSVP error:", error);
     }
   };
 
@@ -108,7 +137,7 @@ export default function Envelope() {
               background: 'linear-gradient(to bottom, #4a5568 0%, #2d3748 100%)',
               clipPath: 'polygon(0 0, 50% 50%, 100% 0)',
               transformStyle: 'preserve-3d',
-              opacity: isOpen ? 0 : 1 // Fade out the top flap
+              opacity: isOpen ? 0 : 1
             }}
           />
 
@@ -136,6 +165,23 @@ export default function Envelope() {
                   Please RSVP by December 1st
                 </p>
               </div>
+              {!isRsvpSubmitted ? (
+                <form onSubmit={handleRsvp} onClick={handleFormClick} className="mt-4 space-y-4">
+                  <div>
+                    <Label htmlFor="name">Your Name</Label>
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your name"
+                      required
+                    />
+                  </div>
+                  <Button type="submit">RSVP</Button>
+                </form>
+              ) : (
+                <p className="text-green-600 font-semibold mt-4">Thank you for your RSVP!</p>
+              )}
             </div>
           </motion.div>
 
@@ -157,5 +203,5 @@ export default function Envelope() {
         </motion.p>
       </motion.div>
     </div>
-  );
+  )
 }

@@ -81,6 +81,36 @@ export async function uploadVideoWithThumbnail(
   }
 }
 
+export async function addToRsvpList(inviteId: string, name: string){
+  try {
+    const invite = await getInviteByDocumentId(inviteId);
+
+    if (!invite) {
+      throw new Error('Invite not found');
+    }
+
+    if(invite.rsvpList.includes(name)) {
+      throw new Error('Name already added to RSVP list');
+    }
+
+    const updatedRsvpList = [...invite.rsvpList, name];
+
+    await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.invitesCollectionId,
+      inviteId,
+      {
+        rsvpList: updatedRsvpList,
+      }
+    );
+
+    console.log("RSVP successfully added:", name);
+  } catch (error) {
+    console.error("Error adding to RSVP list:", error);
+    throw error;
+  }
+}
+
 export async function getFilePreview(fileId: string) {
   try {
     let fileUrl = await storage.getFileView(appwriteConfig.bucketId, fileId);
