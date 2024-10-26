@@ -5,16 +5,7 @@ import { InvitationDetail } from "@/lib/data";
 export default async function Invites({ params }: { params: { id: string } }) {
 
     const invite = await getInviteByDocumentId(params.id);
-    const data :InvitationDetail = {
-        hostName : invite.hostName,
-        inviteeName: invite.inviteeName,
-        customMessage: invite.customMessage,
-        eventDate: invite.eventDate,
-        eventTime: invite.eventTime,
-        location: invite.location,
-        template: invite.template,
-    }
-    console.log(data)
+    
     
     if(!invite){
         return <div>
@@ -24,7 +15,7 @@ export default async function Invites({ params }: { params: { id: string } }) {
 
     return (
         <div className="">
-            <AnimatedEnvelope invitation = {data}/>
+            <AnimatedEnvelope InviteID={params.id}/>
         </div>
     )
 }
