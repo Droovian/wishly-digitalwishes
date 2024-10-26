@@ -94,9 +94,9 @@ export default function Dashboard() {
         setLoading(false)
         return
       }
-
+      const email = user?.primaryEmailAddress?.emailAddress || '';
       try {
-        const response = await getSpacesByCreatorId(user.id)
+        const response = await getSpacesByCreatorId(user.id, email)
         if (response) {
           setVideoGroups(response)
         } else {
@@ -114,11 +114,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (isLoaded) {
+      console.log(user?.primaryEmailAddress?.emailAddress)
       fetchInvitations();
     }
   }, [user, isLoaded]);
 
-
+  const handleSpaceClick = (spaceId:string)=>{
+    router.push(`space/${spaceId}`)
+  }
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">My Digital Creations</h1>
@@ -165,7 +168,7 @@ export default function Dashboard() {
                 videoGroups.map((group) => (
                   <Card key={group.$id}>
                     <CardHeader>
-                      <CardTitle>{group.name}</CardTitle>
+                      <CardTitle onClick={()=>{handleSpaceClick(group.$id)}} className='hover:cursor-pointer'>{group.name}</CardTitle>
                       <CardDescription>
                         {5} collaborators · {4} videos
                       </CardDescription>

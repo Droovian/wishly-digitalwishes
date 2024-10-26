@@ -154,20 +154,21 @@ export const createVideoSpace = async (spaceData: {
 
 //query all the spaces created by the logged in user
 
-export const getSpacesByCreatorId = async (creatorId: string) => {
+export const getSpacesByCreatorId = async (creatorId: string, email: string) => {
   try {
     const response = await databases.listDocuments(
       appwriteConfig.databaseId,  // Your Database ID
-      appwriteConfig.spacesId, //spaces id
-      [Query.equal('creatorId', creatorId)]
+      appwriteConfig.spacesId,    // Spaces Collection ID
+      [Query.or([Query.equal("creatorId", creatorId), Query.contains("collaborators", email)])]
     );
 
-    console.log('Spaces:', response.documents);
     return response.documents;
   } catch (error) {
     console.error('Error fetching spaces:', error);
+    return [];
   }
 };
+
 
 // query to list all the videos related to a particular space
 
@@ -292,7 +293,6 @@ export const updateCollaborators = async (spaceId: string, email: string) => {
     spaceId,
     {
       collaborators: updatedCollaborators,
-      status: true,
     }
   );
 };
