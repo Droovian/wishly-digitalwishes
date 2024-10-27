@@ -1,103 +1,230 @@
-'use client'
-import React, { useRef, useState } from 'react'
-import { Canvas, useFrame, type ThreeElements } from '@react-three/fiber'
-import { useSpring, animated } from '@react-spring/three'
-import { OrbitControls, PerspectiveCamera, useTexture, Shadow, Text } from '@react-three/drei'
-import * as THREE from 'three'
+'use client';
 
-interface BookProps extends Omit<ThreeElements['group'], 'args'> {
-  isOpen: boolean
+import { motion } from "framer-motion";
+import { useState } from "react";
+import Confetti from 'react-confetti';
+
+interface EnvelopeProps{
+
+  inviteId:string
 }
+const Envelope: React.FC<EnvelopeProps> = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [letterVisible, setLetterVisible] = useState(false); // State for letter visibility
+  const [rotateCard, setRotateCard] = useState(false); // State for card rotation
+  const envelopeVariants = {
+    visible: { opacity: 1, scale: 1 },
+    fadeOut: { 
+      opacity: 0,
+      scale: 0.8,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut"
+      }
+    }
+  };
 
-const Book: React.FC<BookProps> = ({ isOpen, ...props }) => {
-  const group = useRef<THREE.Group>(null)
+  // const shapeMap = {
+  //   heart: drawShapes.drawHeart,
+  //   smiley: drawShapes.drawSmiley,
+  //   balloon: drawShapes.drawBalloon,
+  //   default: drawShapes.drawDefaultShape,
+  // };
+
+  const topFlapVariants = {
+    closed: { 
+      rotateX: 0,
+      y: 0,
+      originY: 0,
+      translateZ: 0,
+      opacity: 1,
+    },
+    open: { 
+      rotateX: -180,
+      y: 0,
+      originY: 0,
+      translateZ: 10,
+      opacity: 0,
+      transition: {
+        duration: 1.0,
+        ease: "easeOut"
+      }
+    }
+  }
+
+  const topCardVariants = {
+    closed: { 
+      rotateY: 0,
+      y: 0,
+      originX: 0,
+      translateZ: 0,
+      opacity: 1,
+    },
+    open: { 
+      rotateY: -180,
+      y: 0,
+      originX: 0,
+      translateZ: 10,
+      opacity: 1,
+      transition: {
+        duration: 1.0,
+        ease: "easeOut"
+      }
+    }
+  }
+
+  const letterVariants = {
+    closed: { 
+      y: 0,
+      opacity: 0,
+      scale: 0.8,
+      z: -1,
+    },
+    open: { 
+      y: -160,
+      opacity: 1,
+      scale: 1,
+      z: 1,
+      transition: {
+        delay: 0.3,
+        duration: 0.5,
+        ease: "easeOut",
+      },
+    },
+  };
   
-  // Changed the rotation logic here - when isOpen is true, rotate to open position
-  const { rotation } = useSpring({
-    // When isOpen is true, rotate to Math.PI - 0.3 (open position)
-    // When isOpen is false, rotate back to 0 (closed position)
-    rotation: !isOpen ? Math.PI - 0.3 : 0,
-    config: { mass: 1, tension: 50, friction: 20 }
-  })
+  const handleClick = () => {
+    if (!isOpen) {
+      setLetterVisible(true); // Show the letter first
+      setIsOpen(true);
+      setShowConfetti(true);
+      
+      // Set a timeout to fade out the envelope after showing the letter
+      setTimeout(() => {
+        setShowConfetti(false)
+      }, 5000)
+    }
+  }
+
+  const handleCardClick = () => {
+    if (!rotateCard) {
+      setRotateCard(true);
+    }
+  }
+
+  const handleFormClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  
 
   return (
-    <animated.group ref={group} {...props}>
-      {/* Left half of the book (static) */}
-      <mesh position={[-0.5, 0, 0]} castShadow receiveShadow>
-        <boxGeometry args={[1, 1.5, 0.01]} />
-        <meshStandardMaterial
-          color="#E3FDFD"
-          roughness={0.5}
-          metalness={0.1}
-        />
-      </mesh>
+    <div className="flex justify-center items-center h-screen bg-white">
+      {showConfetti && <Confetti
+        width={typeof window !== 'undefined' ? window.innerWidth : 300}
+        height={typeof window !== 'undefined' ? window.innerHeight : 200}
+        recycle={false}
+        numberOfPieces={200}
+        colors={['#FF69B4', '#FF1493', '#C71585', '#DB7093']} />
+      }
+      <div className="relative">
+        <motion.div
+          initial={{ x: -1000, scale: 1 }}
+          animate={{
+            x: 0,
+            scale: 1.2,
+            rotate: 360,
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 50,
+            damping: 30,
+            delay: 0.5
+          }}
+          className="relative"
+        >
+          <motion.div
+            className="relative w-[600px] h-[350px] cursor-pointer"
+            onClick={handleClick}
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.div
+              variants={envelopeVariants}
+              initial="visible"
+              animate={isOpen ? "fadeOut" : "visible"}
+              className="absolute inset-0"
+            >
+              {/* Base/Bottom of envelope */}
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg shadow-xl" />
+              {/* Left Flap */}
+              <div className="absolute left-0 top-0 w-[300px] h-[350px]" style={{
+                background: 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)',
+                clipPath: 'polygon(0 0, 0% 100%, 100% 50%)'
+              }} />
+              {/* Right Flap */}
+              <div className="absolute right-0 top-0 w-[300px] h-[350px]" style={{
+                background: 'linear-gradient(225deg, #4a5568 0%, #2d3748 100%)',
+                clipPath: 'polygon(100% 0, 100% 100%, 0% 50%)'
+              }} />
+              {/* Top Flap */}
+              <motion.div
+                className="absolute top-0 left-0 w-full z-50 h-[350px]"
+                variants={topFlapVariants}
+                initial="closed"
+                animate={isOpen ? "open" : "closed"}
+                style={{
+                  background: 'linear-gradient(to bottom, #4a5568 0%, #2d3748 100%)',
+                  clipPath: 'polygon(0 0, 50% 50%, 100% 0)',
+                  transformStyle: 'preserve-3d',
+                }}
+              />
+              {/* Envelope shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none rounded-lg" />
+              {/* Border for realism */}
+              <div className="absolute inset-0 border border-gray-600/30 rounded-lg pointer-events-none" />
+            </motion.div>
 
-      {/* Right half of the book (animated) */}
-      <animated.group rotation-y={rotation}>
-        <mesh position={[0.5, 0, 0]} castShadow receiveShadow>
-          <boxGeometry args={[1, 1.5, 0.01]} />
-          <meshStandardMaterial
-            color="#E3FDFD"
-            roughness={0.3}
-            metalness={0.1}
-          />
-        </mesh>
-      </animated.group>
+            {/* Letter Content */}
+            <motion.div
+              variants={letterVariants}
+              initial="closed"
+              animate={isOpen ? "open" : "closed"}
+              className="absolute top-10 left-10 right-10" 
+            >
+                    <motion.div
+                      className="bg-gray-800 w-[420px] h-[520px] absolute"
+                      variants={topCardVariants}
+                      initial="closed"
+                      animate={rotateCard ? "open" : "closed"}
+                      style={{ transformOrigin: "left center" }}
+                      
+                    />
 
-      {/* Book spine */}
-      <mesh position={[0, 0, 0]} castShadow>
-        <boxGeometry args={[0.01, 1.5, 0.03]} />
-        <meshStandardMaterial
-          color="#5C5C5C"
-          roughness={0.7}
-          metalness={0.3}
-        />
-      </mesh>
+                    <motion.div
+                      className="bg-gray-300 w-[420px] h-[520px] absolute"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: rotateCard ? 1 : 0 }}
+                      transition={{ duration: 0.5, delay: 0.4 }} 
+                      onClick={handleCardClick}
+                    />
+                  </motion.div>
+          </motion.div>
 
-      {/* Shadow */}
-      <Shadow
-        position-y={-0.79}
-        scale={[2, 2, 1]}
-        color="black"
-        opacity={0.3}
-      />
-    </animated.group>
-  )
-}
-
-export default function SimpleBookCard() {
-  const [isOpen, setIsOpen] = useState(false)
-
-  return (
-    <div className="w-full h-screen bg-gradient-to-b from-blue-200 to-white">
-      <Canvas shadows>
-        <PerspectiveCamera makeDefault position={[0, 0, 3]} />
-        <OrbitControls 
-          enableZoom={false} 
-          maxPolarAngle={Math.PI / 2} 
-          minPolarAngle={Math.PI / 6} 
-        />
-        <ambientLight intensity={1.5} />
-        <directionalLight
-          position={[5, 5, 5]}
-          intensity={0.5}
-          castShadow
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
-        />
-        <Book isOpen={isOpen} position={[0, 0, 0]} />
-        <mesh rotation-x={-Math.PI / 2} position-y={-0.8} receiveShadow>
-          <planeGeometry args={[10, 10]} />
-          <shadowMaterial transparent opacity={0.2} />
-        </mesh>
-      </Canvas>
-      <button
-        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {/* Button text now correctly reflects the current state */}
-        {isOpen ? 'Close Book' : 'Open Book'}
-      </button>
+          {/* Interaction hint */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2 }}
+            className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-gray-600 text-sm"
+          >
+            {isOpen ? "" : "Click to open"}
+          </motion.p>
+        </motion.div>
+      </div>
     </div>
   )
 }
+
+export default Envelope
