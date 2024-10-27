@@ -37,9 +37,9 @@ const Home = () => {
 
           <div className="mt-12 text-center">
             <p className="text-base text-gray-500 dark:text-gray-300">
-              Can't find what you're looking for? 
+              Looking for more?
               <a href="/custom" className="font-medium text-primary hover:text-primary-dark transition duration-150 ease-in-out ml-1">
-                Request a custom design
+                Coming soon....
               </a>
             </p>
           </div>

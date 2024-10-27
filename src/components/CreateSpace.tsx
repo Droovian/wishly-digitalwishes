@@ -22,13 +22,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
+import { Checkbox } from "./ui/checkbox";
 import 'react-toastify/dist/ReactToastify.css';
 
 // Updated schema to include creator's name
 const spaceSchema = z.object({
   name: z.string().min(5, { message: "Title must be at least 5 characters." }),
+  age: z.string(),
   createdBy: z.string().min(2, { message: "Name must be at least 2 characters." }),
   customMessage: z.string().min(10, { message: "Message must be at least 10 characters." }),
+  addVideo: z.boolean(),
 });
 
 type SpaceFormData = z.infer<typeof spaceSchema>;
@@ -43,6 +46,8 @@ const CreateSpace = () => {
       name: "",
       createdBy: "",
       customMessage: "",
+      age: "",
+      addVideo: false,
     },
   });
 
@@ -53,6 +58,11 @@ const CreateSpace = () => {
       setLoading(true);
       const response = await createVideoSpace(data,user!.id);
       setLoading(false);
+
+      if(!data.addVideo){
+        router.push('/');
+      }
+
       router.push("/dashboard")
       console.log("Video space created:", response);
     } catch (error) {
@@ -69,7 +79,7 @@ const CreateSpace = () => {
       autoClose={3000}
       />
       <CardHeader className="text-center">
-        <CardTitle>Create your own video space!</CardTitle>
+        <CardTitle>Create a wish!</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -80,11 +90,25 @@ const CreateSpace = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name your space</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter space name..." {...field} />
                   </FormControl>
-                  <FormDescription>This will be the name of your space.</FormDescription>
+                  <FormDescription>Enter the name of the person who this is intended for.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+          <FormField
+              control={form.control}
+              name="age"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Enter age</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter age..." {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -120,9 +144,28 @@ const CreateSpace = () => {
               )}
             />
 
+          <FormField
+              control={form.control}
+              name="addVideo"
+              render={({ field }) => (
+                <FormItem className="flex items-center space-x-3">
+                  <FormControl>
+                    <Checkbox
+                      id="addVideos"
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(checked)}
+                      className="flex"
+                    />
+                  </FormControl>
+                  <FormLabel htmlFor="addVideos" className="text-sm">
+                    Add videos?
+                  </FormLabel>
+                </FormItem>
+              )}
+            />
             {/* Submit Button */}
             <Button type="submit" className="w-full" disabled={loading}>
-              Create a space
+              Submit
             </Button>
           </form>
         </Form>

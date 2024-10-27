@@ -153,7 +153,7 @@ export default function Dashboard() {
               </Card>
             ))}
             <Card className="flex items-center justify-center">
-              <Button variant="ghost"><Plus className="mr-2 h-4 w-4" /> Create New Invitation</Button>
+              <Button variant="ghost" onClick={() => router.push('/home')}><Plus className="mr-2 h-4 w-4" /> Create New Invitation</Button>
             </Card>
           </div>
         </TabsContent>

@@ -1,3 +1,5 @@
+"use client";
+
 import VideoUploadForm from "@/components/VideoForm";
 import { Suspense, useEffect, useState } from "react";
 import FormLoader from "@/components/skeletons/form-loader";

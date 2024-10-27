@@ -44,7 +44,7 @@ export default function Navbar() {
         <div className="hidden sm:flex items-center space-x-4">
           <div className="border rounded-xl p-3">
             <ul className="flex font-bold text-gray-600 text-sm space-x-4">
-              <NavLink href="/create">Start a space</NavLink>
+              <NavLink href="/create">Create a wish</NavLink>
               <NavLink href="/about">About</NavLink>
             </ul>
           </div>
