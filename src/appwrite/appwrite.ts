@@ -262,6 +262,7 @@ export const createInvite = async (inviteData: {
   location?: string;
   template: string;
   userId: string
+  inviteType:string
 }) => {
   try {
     console.log(inviteData.userId);

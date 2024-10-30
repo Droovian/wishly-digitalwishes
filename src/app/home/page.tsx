@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react';
 import { Suspense } from 'react';
 import { OccasionCards } from '@/components/OccasionCards';
 import { HeaderTextOccasion } from '@/components/OccasionHeader';

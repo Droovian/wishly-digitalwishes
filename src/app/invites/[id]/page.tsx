@@ -13,6 +13,7 @@ export default async function Invites({ params }: { params: { id: string } }) {
         eventTime: invite.eventTime,
         location: invite.location,
         template: invite.template,
+        inviteType:invite.inviteType,
     }
     console.log(data)
     
@@ -24,7 +25,7 @@ export default async function Invites({ params }: { params: { id: string } }) {
 
     return (
         <div className="">
-            <AnimatedEnvelope inviteId={params.id} invitation = {data}/>
+            <AnimatedEnvelope inviteId={params.id} invitation = {data} InviteType={data.inviteType}/>
         </div>
     )
 }

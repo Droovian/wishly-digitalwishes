@@ -1,99 +1,120 @@
 // Letter.tsx
 "use client"
 import { InvitationDetail } from "@/lib/data";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react";
 import { addToRsvpList } from "@/appwrite/appwrite";
-
+import { mouseUpEvent, Opacity } from "@tsparticles/engine";
+import { PartyPopper, X } from "lucide-react";
+import { MouseEventHandler } from "react";
+import BirthdayInvite from "./templates/birthday";
+import ValentineInvite from "./templates/valentines";
+import PartyInvite from "./templates/party";
 interface LetterProps {
   invitation: InvitationDetail;
   isOpen: boolean;
-  inviteId:string
+  inviteId:string;
+  inviteType:string 
 }
 
+const InviteComponent = ({ inviteType, invitation, inviteId, isOpen }:LetterProps) => {
+  let InviteToRender;
 
-const Letter: React.FC<LetterProps> = ({ invitation, isOpen,inviteId }) => {
+  switch (inviteType) {
+    case "valentine":
+      InviteToRender = (
+        <ValentineInvite invitation={invitation} isOpen={isOpen} inviteId={inviteId} />
+      );
+      break;
+    case "birthday":
+      InviteToRender = (
+        <BirthdayInvite invitation={invitation} isOpen={isOpen} inviteId={inviteId} />
+      );
+      break;
+    case "houseparty":
+      InviteToRender = (
+        <PartyInvite invitation={invitation} isOpen={isOpen} inviteId={inviteId} />
+      );
+      break;
+    default:
+      InviteToRender = <div>Invalid invite type</div>; // Optional: handle unexpected types
+  }
 
-  const [isRsvpSubmitted, setIsRsvpSubmitted] = useState<boolean>(false)
-  const handleFormClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    };
-  const [name1, setName] = useState("")
-  const letterVariants = {
-    closed: {
-      y: 0,
-      opacity: 0,
-      scale: 0.8,
-      z: -1,
-    },
-    open: {
-      y: -180,
-      opacity: 1,
-      scale: 1.2, // Increase scale for a larger area
-      z: 1,
-      transition: {
-        delay: 0.3,
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  };
+  return <div>{InviteToRender}</div>;
+};
 
-  const handleRsvp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!name1.trim()) {
-      alert("Please enter your name to RSVP.");
-      return;
+const CardRotation = 15;
+const CardScale = 1.07;
+const Letter: React.FC<LetterProps> = ({ invitation, isOpen,inviteId,inviteType }) => {
+  const xPcnt = useSpring(0,{bounce:0})
+  const yPcnt = useSpring(0,{bounce:0})
+  const mouseX = useSpring(0,{bounce:0})
+  const mouseY = useSpring(0,{bounce:0})
+  const rotateX = useTransform(yPcnt,[-0.5,0.5],[`-${CardRotation}deg`,`${CardRotation}deg`])
+  const rotateY = useTransform(xPcnt,[-0.5,0.5],[`-${CardRotation}deg`,`${CardRotation}deg`])
+  const scale = useSpring(1,{bounce:0})
+  const getMousePosition = (e:React.MouseEvent<Element, MouseEvent>) => {
+    const {width,height,left,top} = 
+    e.currentTarget.getBoundingClientRect();
+    const currentMouseX = e.clientX - left
+    const currentMouseY = e.clientY - top
+    
+    
+       
+    return{
+      currentMouseX,
+      currentMouseY,
+      containerWidth:width,
+      containerHeight:height,
+    }
+  }
+  const handleMouse:MouseEventHandler = (e) =>{
+      const {currentMouseX,currentMouseY,containerWidth,containerHeight} = getMousePosition(e)
+      xPcnt.set(currentMouseX/containerWidth -0.5) 
+      yPcnt.set(currentMouseX/containerHeight -0.5)
+      mouseX.set(currentMouseX)
+      mouseY.set(currentMouseY)
+
     }
 
-    try {
-      await addToRsvpList(inviteId, name1);
-      setIsRsvpSubmitted(true);
-      alert(`Thank you for your RSVP, ${name1}!`);
-    } catch (error) {
-      alert("Error submitting RSVP. Please try again.");
-      console.error("RSVP error:", error);
-    }
-  };
-  return (
-    <motion.div
-                className="bg-white rounded-lg p-10 shadow-lg"
-                style={{ width: '100%', height: 'calc(100% - 20px)' }} // Maintain letter size
-              >
-                <div className="text-center space-y-4">
-                <h2 className="text-4xl font-bold text-gray-800">You're Invited!</h2>
-                <p className="text-lg text-gray-600">{invitation.customMessage}</p>
-                <div className="pt-4 text-gray-700">
-                  <p>{invitation.eventDate}</p>
-                  <p>{invitation.eventTime}</p>
-                  <p>{invitation.location}</p>
-                </div>
-                  <div className="pt-4">
-                    <p className="text-sm text-gray-500 italic">Please RSVP by December 1st</p>
-                  </div>
-                </div>
-                {!isRsvpSubmitted ? (
-                <form onSubmit={handleRsvp} onClick={handleFormClick} className="mt-4 space-y-4">
-                  <div>
-                    <Label htmlFor="name">Your Name</Label>
-                    <Input
-                      id="name"
-                      value={name1}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter your name"
-                      required
-                    />
-                  </div>
-                  <Button type="submit">RSVP</Button>
-                </form>
-              ) : (
-                <p className="text-green-600 font-semibold mt-4">Thank you for your RSVP!</p>
-              )}
-              </motion.div>
+  const handleMouseEnter :MouseEventHandler =(e) => {
+    scale.set(CardScale)
+  }
+  const handleMouseLeave :MouseEventHandler =(e) => {
+    scale.set(1)
+    xPcnt.set(0)
+    yPcnt.set(0)
+
+  }
+
+ 
+  return (<>
+        <div className = "" onMouseMove={handleMouse}>
+        <div >         
+        <motion.div
+          className=""
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          style={{ width: '100%', height: 'calc(100% - 20px)', transformStyle:'preserve-3d',
+            rotateX,
+            rotateY,
+            scale  }} 
+          // Maintain letter size
+        >
+          {/* <ValentineInvite invitation={invitation} isOpen={isOpen} inviteId={inviteId}/> */}
+          {/* <BirthdayInvite invitation={invitation} isOpen={isOpen} inviteId={inviteId}/> */}
+          {/* <PartyInvite invitation={invitation} isOpen={isOpen} inviteId={inviteId}/> */}
+            <div>
+            <InviteComponent invitation = {invitation} isOpen= {isOpen} inviteId = {inviteId} inviteType = {inviteType}/>
+            </div>
+        </motion.div>
+      </div>
+    </div>
+        </>
+             
   );
 };
 

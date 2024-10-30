@@ -9,19 +9,25 @@ import FormLoader from "@/components/skeletons/form-loader"
 export default function Page({ params }: { params: { slug: string}}){
 
     let selectedImage;
-
+    let inviteType = "houseparty";
     switch(params.slug){
         case "birthday": BirthdayParty;
         selectedImage = BirthdayParty;
+        inviteType = "birthday"
         break;
         case "houseparty": HouseParty;
         selectedImage = HouseParty;
+        inviteType = "houseparty"
+
         break;
-        case "date": Date;
+        case "valentine": Date;
         selectedImage = Date;
+        inviteType = "valentine"
+
         break;
         default: 
         selectedImage = HouseParty;
+        inviteType = "houseparty"
     }
 
     return (
@@ -35,7 +41,7 @@ export default function Page({ params }: { params: { slug: string}}){
             </div>
             <Suspense fallback={<FormLoader/>}>
                 <div className="">
-                    <InviteForm/>
+                    <InviteForm inviteType = {inviteType}/>
                 </div>
             </Suspense>
             
