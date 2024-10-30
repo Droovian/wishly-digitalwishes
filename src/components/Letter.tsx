@@ -24,7 +24,7 @@ const InviteComponent = ({ inviteType, invitation, inviteId, isOpen }:LetterProp
   let InviteToRender;
 
   switch (inviteType) {
-    case "valentine":
+    case "date":
       InviteToRender = (
         <ValentineInvite invitation={invitation} isOpen={isOpen} inviteId={inviteId} />
       );
