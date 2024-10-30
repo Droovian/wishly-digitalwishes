@@ -2,6 +2,7 @@ import { getInviteByDocumentId } from "@/appwrite/appwrite";
 import BookInvitation from "@/components/invitations/BookInvitation";
 import AnimatedEnvelope from "@/components/Envelope";
 import { InvitationDetail } from "@/lib/data";
+import {Background} from "@/components/background";
 export default async function Invites({ params }: { params: { id: string } }) {
 
     const invite = await getInviteByDocumentId(params.id);
@@ -25,6 +26,7 @@ export default async function Invites({ params }: { params: { id: string } }) {
 
     return (
         <div className="">
+            <Background inviteType={data.inviteType} />
             <AnimatedEnvelope inviteId={params.id} invitation = {data} InviteType={data.inviteType}/>
         </div>
     )
