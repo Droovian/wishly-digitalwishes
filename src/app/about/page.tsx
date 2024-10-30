@@ -1,4 +1,4 @@
-import VideoGroupCarousel from "@/components/templates/video-group-carousel"
+import VideoGroupMessage from "@/components/templates/video-group-carousel"
 
 const videos = [
     {
@@ -20,6 +20,8 @@ const videos = [
 
 export default function About(){
     return (
-       <VideoGroupCarousel videos={videos}/>
+        <div className="flex justify-center h-screen bg-yellow-100">
+            <VideoGroupMessage videos={videos} />
+        </div>
     )
 }
