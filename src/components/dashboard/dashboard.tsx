@@ -143,8 +143,7 @@ export default function Dashboard() {
             {invitations.map((invitation) => (
               <Card key={invitation.$id}>
                 <CardHeader>
-                  <CardTitle>{invitation.$id}</CardTitle>
-                  <CardTitle>{invitation.hostName}</CardTitle>
+                  <CardTitle>To: {invitation.hostName}</CardTitle>
                 </CardHeader>
                 <CardFooter>
                   <Button variant="outline" onClick={() => formInviLink(invitation?.$id)}>
@@ -154,7 +153,7 @@ export default function Dashboard() {
               </Card>
             ))}
             <Card className="flex items-center justify-center">
-              <Button variant="ghost"><Plus className="mr-2 h-4 w-4" /> Create New Invitation</Button>
+              <Button variant="ghost" onClick={() => router.push('/home')}><Plus className="mr-2 h-4 w-4" /> Create New Invitation</Button>
             </Card>
           </div>
         </TabsContent>
@@ -169,19 +168,16 @@ export default function Dashboard() {
                   <Card key={group.$id}>
                     <CardHeader>
                       <CardTitle onClick={()=>{handleSpaceClick(group.$id)}} className='hover:cursor-pointer'>{group.name}</CardTitle>
-                      <CardDescription>
-                        {5} collaborators · {4} videos
-                      </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-3 items-center">
                         <Button variant="outline" onClick={() => createCollabLink(group.$id)}>
                           Create Collab Link
                         </Button>
                         <Button variant="outline" onClick={() => { router.push(`/space/${group.$id}`) }}>Add Video</Button> 
-                        <Button variant="destructive" onClick={() => handleDeleteSpace(group.$id)}>
-                          <Trash className="mr-2 h-4 w-4" /> Delete
-                        </Button>   
+                        
+                          <Trash onClick={()=> handleDeleteSpace(group.$id)} className="mr-2 h-4 w-4" /> 
+                         
                       </div>
                     </CardContent>
                   </Card>

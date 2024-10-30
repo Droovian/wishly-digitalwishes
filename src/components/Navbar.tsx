@@ -1,39 +1,95 @@
-"use client";
+'use client'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect } from 'react'
-import BorderButton from './BorderButton'
-import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
-import { SignOutButton } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-const Navbar = () => {
+import React, { useState } from 'react'
+import { UserButton, SignedIn, SignedOut, SignInButton, SignOutButton } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
+import { Menu, X } from 'lucide-react'
 
-    const router = useRouter();
+import { Button } from "@/components/ui/button"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+
+export default function Navbar() {
+  const router = useRouter()
+  const [isOpen, setIsOpen] = useState(false)
+
+  const toggleMenu = () => setIsOpen(!isOpen)
+
+  const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+    <Link
+      href={href}
+      className="text-gray-600 hover:text-gray-800 transition-colors"
+      onClick={() => setIsOpen(false)}
+    >
+      {children}
+    </Link>
+  )
 
   return (
-    <div className='w-full h-20 bg-white border-b-1 border-gray-500'>
-        <div className='flex items-center justify-between w-11/12 mx-auto h-full'>
-            <button onClick={() => {router.back()}} className='font-bold text-xl sm:text-3xl text-[#000000]'>Wishly</button>
-            <div className='invisible sm:visible border rounded-xl p-3'>
-                <ul className='flex font-bold text-gray-600 text-sm space-x-4 mx-10'>
-                    <Link href={"/create"} className='hover:text-gray-800'>Start a space</Link>
-                    <Link href={"/about"} className='hover:text-gray-800'>about</Link>
-                </ul>
-            </div>
-            <div className="flex items-center">
+    <nav className="w-full h-20 bg-white border-b border-gray-200">
+      <div className="flex items-center justify-between w-11/12 mx-auto h-full">
+        <button onClick={() => { router.back() }} className="font-bold text-xl sm:text-3xl text-black">
+          Invicollab
+        </button>
+
+        {/* Desktop Navigation */}
+        <div className="hidden sm:flex items-center space-x-4">
+          <div className="border rounded-xl p-3">
+            <ul className="flex font-bold text-gray-600 text-sm space-x-4">
+              <NavLink href="/create">Create a wish</NavLink>
+              <NavLink href="/about">About</NavLink>
+            </ul>
+          </div>
+          <SignedIn>
+            <SignOutButton>
+                <Button variant="destructive">Sign out</Button>
+            </SignOutButton>
+          </SignedIn>
+          <SignedOut>
+            <SignInButton>
+              <Button variant="outline">Sign in</Button>
+            </SignInButton>
+          </SignedOut>
+        </div>
+
+        <div className="sm:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-gray-700">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <div className="mt-6 flex flex-col space-y-4">
+                <NavLink href="/create">Start a space</NavLink>
+                <NavLink href="/about">About</NavLink>
                 <SignedIn>
-                    <SignOutButton redirectUrl='/' />
+                  <SignOutButton>
+                    <Button variant="destructive" className="w-full">Sign out</Button>
+                  </SignOutButton>
                 </SignedIn>
                 <SignedOut>
-                <SignInButton>
-                    <BorderButton text='Sign in' />
-                </SignInButton>
+                  <SignInButton>
+                    <Button className="w-full">Sign in</Button>
+                  </SignInButton>
                 </SignedOut>
-            </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
-    </div>
+      </div>
+    </nav>
   )
 }
-
-export default Navbar

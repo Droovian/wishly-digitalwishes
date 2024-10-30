@@ -1,265 +1,230 @@
-"use client"
-import React, { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  BookOpen, 
-  Heart, 
-  Gift, 
-  PartyPopper, 
-  Sparkles,
-  Play,
-  Pause
-} from 'lucide-react'
-import { Card } from "@/components/ui/card"
+'use client';
 
-interface Video {
-  id: string
-  url: string
-  title: string
-  date?: string
+import { motion } from "framer-motion";
+import { useState } from "react";
+import Confetti from 'react-confetti';
+
+interface EnvelopeProps{
+
+  inviteId:string
 }
-
-interface PolaroidCollectionProps {
-  videos: Video[]
-  recipientName?: string
-}
-
-export default function PolaroidCollection({
-  videos,
-  recipientName = "Dearest Friend"
-}: PolaroidCollectionProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [focusedIndex, setFocusedIndex] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
-
-  // Initialize video refs
-  useEffect(() => {
-    videoRefs.current = videoRefs.current.slice(0, videos.length)
-  }, [videos])
-
-  // Handle video playback
-  useEffect(() => {
-    videoRefs.current.forEach((videoRef, index) => {
-      if (videoRef) {
-        if (index === focusedIndex && isPlaying) {
-          videoRef.play()
-        } else {
-          videoRef.pause()
-          videoRef.currentTime = 0
-        }
-      }
-    })
-  }, [focusedIndex, isPlaying])
-
-  const handleVideoToggle = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsPlaying(!isPlaying)
-  }
-
-  const containerVariants = {
-    closed: { opacity: 0 },
-    open: {
-      opacity: 1,
+const Envelope: React.FC<EnvelopeProps> = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [letterVisible, setLetterVisible] = useState(false); // State for letter visibility
+  const [rotateCard, setRotateCard] = useState(false); // State for card rotation
+  const envelopeVariants = {
+    visible: { opacity: 1, scale: 1 },
+    fadeOut: { 
+      opacity: 0,
+      scale: 0.8,
       transition: {
-        staggerChildren: 0.15
+        duration: 0.6,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  // const shapeMap = {
+  //   heart: drawShapes.drawHeart,
+  //   smiley: drawShapes.drawSmiley,
+  //   balloon: drawShapes.drawBalloon,
+  //   default: drawShapes.drawDefaultShape,
+  // };
+
+  const topFlapVariants = {
+    closed: { 
+      rotateX: 0,
+      y: 0,
+      originY: 0,
+      translateZ: 0,
+      opacity: 1,
+    },
+    open: { 
+      rotateX: -180,
+      y: 0,
+      originY: 0,
+      translateZ: 10,
+      opacity: 0,
+      transition: {
+        duration: 1.0,
+        ease: "easeOut"
       }
     }
   }
 
-  const polaroidVariants = {
+  const topCardVariants = {
     closed: { 
-      y: 100, 
-      opacity: 0,
-      rotateX: 45
-    },
-    open: (i: number) => ({
+      rotateY: 0,
       y: 0,
+      originX: 0,
+      translateZ: 0,
       opacity: 1,
-      rotateX: 0,
-      rotate: (i % 2 === 0 ? -2 : 2) + (Math.random() * 1 - 0.5),
+    },
+    open: { 
+      rotateY: -180,
+      y: 0,
+      originX: 0,
+      translateZ: 10,
+      opacity: 1,
       transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 20,
-        delay: i * 0.15
+        duration: 1.0,
+        ease: "easeOut"
       }
-    })
+    }
   }
 
+  const letterVariants = {
+    closed: { 
+      y: 0,
+      opacity: 0,
+      scale: 0.8,
+      z: -1,
+    },
+    open: { 
+      y: -160,
+      opacity: 1,
+      scale: 1,
+      z: 1,
+      transition: {
+        delay: 0.3,
+        duration: 0.5,
+        ease: "easeOut",
+      },
+    },
+  };
+  
+  const handleClick = () => {
+    if (!isOpen) {
+      setLetterVisible(true); // Show the letter first
+      setIsOpen(true);
+      setShowConfetti(true);
+      
+      // Set a timeout to fade out the envelope after showing the letter
+      setTimeout(() => {
+        setShowConfetti(false)
+      }, 5000)
+    }
+  }
+
+  const handleCardClick = () => {
+    if (!rotateCard) {
+      setRotateCard(true);
+    }
+  }
+
+  const handleFormClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-zinc-100 to-zinc-200 p-6">
-      <AnimatePresence>
-        {!isOpen ? (
+    <div className="flex justify-center items-center h-screen bg-white">
+      {showConfetti && <Confetti
+        width={typeof window !== 'undefined' ? window.innerWidth : 300}
+        height={typeof window !== 'undefined' ? window.innerHeight : 200}
+        recycle={false}
+        numberOfPieces={200}
+        colors={['#FF69B4', '#FF1493', '#C71585', '#DB7093']} />
+      }
+      <div className="relative">
+        <motion.div
+          initial={{ x: -1000, scale: 1 }}
+          animate={{
+            x: 0,
+            scale: 1.2,
+            rotate: 360,
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 50,
+            damping: 30,
+            delay: 0.5
+          }}
+          className="relative"
+        >
           <motion.div
-            initial={{ scale: 0.9, opacity: 0, rotateY: -20 }}
-            animate={{ scale: 1, opacity: 1, rotateY: 0 }}
-            exit={{ scale: 0.9, opacity: 0, rotateY: 20 }}
-            transition={{ type: "spring", stiffness: 100, damping: 20 }}
-          >
-            <Card 
-              className="bg-gradient-to-br from-zinc-900 to-zinc-800 border-none shadow-2xl cursor-pointer w-[400px] overflow-hidden"
-              onClick={() => setIsOpen(true)}
-            >
-              <motion.div 
-                className="p-12 text-center relative"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {/* Decorative elements */}
-                <div className="absolute top-0 left-0 w-full h-full opacity-10">
-                  <div className="absolute top-4 left-4 w-24 h-24 border-t-2 border-l-2 border-white" />
-                  <div className="absolute bottom-4 right-4 w-24 h-24 border-b-2 border-r-2 border-white" />
-                </div>
-
-                <div className="relative">
-                  <BookOpen className="w-16 h-16 mx-auto mb-8 text-zinc-100" />
-                  <motion.div 
-                    className="absolute -top-2 -right-2"
-                    animate={{ 
-                      scale: [1, 1.2, 1],
-                      rotate: [0, 10, 0]
-                    }}
-                    transition={{ 
-                      duration: 2,
-                      repeat: Infinity,
-                      repeatType: "reverse"
-                    }}
-                  >
-                    <Sparkles className="w-6 h-6 text-yellow-400" />
-                  </motion.div>
-                </div>
-
-                <div className="font-serif space-y-6 text-white">
-                  <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <h2 className="text-2xl text-zinc-300 uppercase tracking-wider">Hey Shivam</h2>
-                    </div>
-                    <h1 className="text-4xl font-bold mb-4">Happy birthday</h1>
-                    <h3 className="text-3xl italic text-zinc-200">for</h3>
-                  </motion.div>
-                  
-                  <motion.p 
-                    className="text-zinc-400 mt-8 text-lg flex items-center justify-center gap-2"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                  >
-                    Open to begin your journey...
-                    <PartyPopper className="w-5 h-5 text-yellow-400" />
-                  </motion.p>
-                </div>
-              </motion.div>
-            </Card>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="w-full max-w-[1600px]"
+            className="relative w-[600px] h-[350px] cursor-pointer"
+            onClick={handleClick}
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
           >
             <motion.div
-              variants={containerVariants}
-              initial="closed"
-              animate="open"
-              className="flex flex-wrap justify-center gap-12 relative py-12"
+              variants={envelopeVariants}
+              initial="visible"
+              animate={isOpen ? "fadeOut" : "visible"}
+              className="absolute inset-0"
             >
-              {videos.map((video, index) => (
-                <motion.div
-                  key={video.id}
-                  variants={polaroidVariants}
-                  custom={index}
-                  className={`transform-gpu cursor-pointer ${
-                    index === focusedIndex ? 'z-10' : 'z-0'
-                  }`}
-                >
-                  <motion.div
-                    className="transition-all duration-500"
-                    animate={{
-                      scale: index === focusedIndex ? 1.05 : 1,
-                      opacity: index === focusedIndex ? 1 : 0.85,
-                    }}
-                    whileHover={{ 
-                      scale: 1.02,
-                      transition: { duration: 0.2 }
-                    }}
-                    onClick={() => setFocusedIndex(index)}
-                  >
-                    {/* Polaroid Frame */}
-                    <div className="bg-white p-6 pb-20 shadow-2xl w-[480px]">
-                      {/* Video Container */}
-                      <div className="aspect-[4/3] bg-black mb-4 relative overflow-hidden rounded-sm">
-                        <video
-                          ref={el => {
-                            videoRefs.current[index] = el; // Assign the video element
-                            return; // Explicitly return nothing
-                          }}
-                          src={video.url}
-                          className="w-full h-full object-cover"
-                          loop
-                          muted={false}
-                        />
-                        {index === focusedIndex && (
-                          <motion.button
-                            className="absolute bottom-4 right-4 bg-white/90 p-2 rounded-full shadow-lg"
-                            onClick={handleVideoToggle}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            {isPlaying ? (
-                              <Pause className="w-6 h-6 text-zinc-800" />
-                            ) : (
-                              <Play className="w-6 h-6 text-zinc-800" />
-                            )}
-                          </motion.button>
-                        )}
-                      </div>
-                      
-                      {/* Polaroid Caption */}
-                      <div className="absolute bottom-6 left-0 right-0 text-center font-serif">
-                        <div className="flex items-center justify-center gap-2">
-                          <Sparkles className="w-4 h-4 text-zinc-400" />
-                          <p className="text-zinc-800 text-xl">{video.title}</p>
-                          <Sparkles className="w-4 h-4 text-zinc-400" />
-                        </div>
-                        <p className="text-zinc-500 text-base mt-2">
-                          {video.date || new Date().toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              ))}
+              {/* Base/Bottom of envelope */}
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg shadow-xl" />
+              {/* Left Flap */}
+              <div className="absolute left-0 top-0 w-[300px] h-[350px]" style={{
+                background: 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)',
+                clipPath: 'polygon(0 0, 0% 100%, 100% 50%)'
+              }} />
+              {/* Right Flap */}
+              <div className="absolute right-0 top-0 w-[300px] h-[350px]" style={{
+                background: 'linear-gradient(225deg, #4a5568 0%, #2d3748 100%)',
+                clipPath: 'polygon(100% 0, 100% 100%, 0% 50%)'
+              }} />
+              {/* Top Flap */}
+              <motion.div
+                className="absolute top-0 left-0 w-full z-50 h-[350px]"
+                variants={topFlapVariants}
+                initial="closed"
+                animate={isOpen ? "open" : "closed"}
+                style={{
+                  background: 'linear-gradient(to bottom, #4a5568 0%, #2d3748 100%)',
+                  clipPath: 'polygon(0 0, 50% 50%, 100% 0)',
+                  transformStyle: 'preserve-3d',
+                }}
+              />
+              {/* Envelope shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none rounded-lg" />
+              {/* Border for realism */}
+              <div className="absolute inset-0 border border-gray-600/30 rounded-lg pointer-events-none" />
             </motion.div>
 
-            {/* Navigation Dots */}
-            <div className="text-center font-serif text-zinc-600">
-              <p className="text-lg mb-4 flex items-center justify-center gap-2">
-                Click to focus...
-              </p>
-              <div className="flex justify-center gap-3 mt-2">
-                {videos.map((_, index) => (
-                  <motion.button
-                    key={index}
-                    className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                      index === focusedIndex ? 'bg-zinc-800' : 'bg-zinc-300'
-                    }`}
-                    whileHover={{ scale: 1.2 }}
-                    onClick={() => setFocusedIndex(index)}
-                  />
-                ))}
-              </div>
-            </div>
+            {/* Letter Content */}
+            <motion.div
+              variants={letterVariants}
+              initial="closed"
+              animate={isOpen ? "open" : "closed"}
+              className="absolute top-10 left-10 right-10" 
+            >
+                    <motion.div
+                      className="bg-gray-800 w-[420px] h-[520px] absolute"
+                      variants={topCardVariants}
+                      initial="closed"
+                      animate={rotateCard ? "open" : "closed"}
+                      style={{ transformOrigin: "left center" }}
+                      
+                    />
+
+                    <motion.div
+                      className="bg-gray-300 w-[420px] h-[520px] absolute"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: rotateCard ? 1 : 0 }}
+                      transition={{ duration: 0.5, delay: 0.4 }} 
+                      onClick={handleCardClick}
+                    />
+                  </motion.div>
           </motion.div>
-        )}
-      </AnimatePresence>
+
+          {/* Interaction hint */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2 }}
+            className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-gray-600 text-sm"
+          >
+            {isOpen ? "" : "Click to open"}
+          </motion.p>
+        </motion.div>
+      </div>
     </div>
   )
 }
+
+export default Envelope

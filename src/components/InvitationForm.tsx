@@ -91,12 +91,9 @@ export default function InviteForm({inviteType}:InviteType) {
       <ToastContainer 
         position="top-center"
       />
-      <CardHeader>
-        <CardTitle>Create Digital Invite</CardTitle>
-      </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-10">
             <FormField
               control={form.control}
               name="hostName"
