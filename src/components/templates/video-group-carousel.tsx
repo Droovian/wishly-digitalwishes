@@ -95,6 +95,18 @@ export default function Component({ videos,details }: VideoGroupMessageProps) {
       },
     },
   };
+  const cardMovement = {
+    closed: { 
+      opacity: 1,
+      translateX: "0px",
+      transition: { duration: 0.7 },
+    },
+    open: { 
+      opacity: 1,
+      translateX: "250px", // Adjust this value to control how far right it moves
+      transition: { duration: 1.0, ease: "easeOut" },
+    }
+  }
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -170,8 +182,13 @@ export default function Component({ videos,details }: VideoGroupMessageProps) {
       closeVideo();
     }
   };
-
+  const bottomCardVariants = {
+    initial: { opacity: 1 },
+    animate: { opacity: 1, transition: { duration: 0.5 } }
+  };
   return (
+  
+
     <div className="flex justify-center items-center">
       {showConfetti && (
         <Confetti
@@ -197,19 +214,19 @@ export default function Component({ videos,details }: VideoGroupMessageProps) {
             delay: 0.5
           }}
           className="relative"
-        >
+          >
           <motion.div
             className="relative w-[600px] h-[350px] cursor-pointer"
             onClick={handleClick}
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
-          >
+            >
             <motion.div
               variants={envelopeVariants}
               initial="visible"
               animate={isOpen ? "fadeOut" : "visible"}
               className="absolute inset-0"
-            >
+              >
               <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg shadow-xl" />
               <div className="absolute left-0 top-0 w-[300px] h-[350px]" style={{
                 background: 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)',
@@ -229,7 +246,7 @@ export default function Component({ videos,details }: VideoGroupMessageProps) {
                   clipPath: 'polygon(0 0, 50% 50%, 100% 0)',
                   transformStyle: 'preserve-3d',
                 }}
-              />
+                />
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none rounded-lg" />
               <div className="absolute inset-0 border border-gray-600/30 rounded-lg pointer-events-none" />
             </motion.div>
@@ -239,137 +256,144 @@ export default function Component({ videos,details }: VideoGroupMessageProps) {
               initial="closed"
               animate={isOpen ? "open" : "closed"}
               className="flex justify-center items-center w-full" 
-            >
-              <motion.div
-                className="relative z-20 border-2 border-black bg-amber-100 w-[420px] h-[520px] overflow-hidden"
-                variants={topCardVariants}
-                initial="closed"
-                animate={controls}
-                style={{ transformOrigin: "left center" }}
-                onClick={handleCardClick}
               >
-                {rotateCard ? (
-                 <div className="h-full w-full p-8 flex flex-col items-center justify-center" style={{ transform: 'rotateY(180deg)' }}>
-                 <p className="text-sm font-bold text-gray-800">
-                   {details?.customMessage}
-                 </p>
-               </div>
-                  
-                ) : (
-                  <div className="relative h-full w-full p-8 flex flex-col items-center justify-center">
-                    {/* Subtle decorative line */}
-                    <motion.div 
-                      className="absolute top-6 left-8 right-8 h-px bg-black"
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 1, delay: 0.5 }}
-                    />
 
-                    {/* Main content */}
-                    <div className="relative flex flex-col items-center space-y-8 mt-3">
-                      <motion.div
-                        className="text-center space-y-3"
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 0.8 }}
-                      >
-                        <h2 className="text-sm font-light tracking-widest mt-2 uppercase">
-                          Dear {details?.name}
-                        </h2>
-                        <h1 className="text-4xl font-serif text-gray-800">
-                         Happy Birthday!
-                        </h1>
-                      </motion.div>
+               
+              <motion.div
+              variants={cardMovement}
+              >
 
-                      <AnimatedBirthdayCake />
+                              <motion.div
+                                className="relative left-5 z-20 border-2 border-black bg-amber-100 w-[420px] h-[520px] overflow-hidden"
+                                variants={topCardVariants}
+                                initial="closed"
+                                animate={controls}
+                                style={{ transformOrigin: "left center" }}
+                                onClick={handleCardClick}
+                                >
+                                {rotateCard ? (
+                                  <div className="h-full w-full p-8 flex flex-col items-center justify-center" style={{ transform: 'rotateY(180deg)' }}>
+                                <p className="text-sm font-bold text-gray-800">
+                                  {details?.customMessage}
+                                </p>
+                              </div>
+                                  
+                                ) : (
+                                  <div className="relative h-full w-full p-8 flex flex-col items-center justify-center">
+                                    {/* Subtle decorative line */}
+                                    <motion.div 
+                                      className="absolute top-6 left-8 right-8 h-px bg-black"
+                                      initial={{ scaleX: 0 }}
+                                      animate={{ scaleX: 1 }}
+                                      transition={{ duration: 1, delay: 0.5 }}
+                                    />
 
-                      <motion.div
-                        className="absolute bottom-[-17px] flex space-x-5 text-sm"
-                        
-                        animate={{ 
-                          opacity: 1,
-                          y: [0, -10, 0],
-                          scale: [1.1, 1.2, 1.1],
-                        }}
-                        transition={{ 
-                          duration: 1.5,
-                          repeat: Infinity,
-                          repeatType: "loop",
-                          ease: "easeInOut"
-                        }}
-                      >
-                        <MousePointerClick size={40} />
-                      </motion.div>
-                    </div>
+                                    {/* Main content */}
+                                    <div className="relative flex flex-col items-center space-y-8 mt-3">
+                                      <motion.div
+                                        className="text-center space-y-3"
+                                        initial={{ y: -10, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ duration: 0.8 }}
+                                        >
+                                        <h2 className="text-sm font-light tracking-widest mt-2 uppercase">
+                                          Dear {details?.name}
+                                        </h2>
+                                        <h1 className="text-4xl font-serif text-gray-800">
+                                        Happy Birthday!
+                                        </h1>
+                                      </motion.div>
 
-                    {/* Bottom decorative line */}
-                    <motion.div 
-                      className="absolute bottom-6 left-8 right-8 h-px bg-black"
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 1, delay: 0.5 }}
-                    />
-                  </div>
-                )}
+                                      <AnimatedBirthdayCake />
+
+                                      <motion.div
+                                        className="absolute bottom-[-17px] flex space-x-5 text-sm"
+                                        
+                                        animate={{ 
+                                          opacity: 1,
+                                          y: [0, -10, 0],
+                                          scale: [1.1, 1.2, 1.1],
+                                        }}
+                                        transition={{ 
+                                          duration: 1.5,
+                                          repeat: Infinity,
+                                          repeatType: "loop",
+                                          ease: "easeInOut"
+                                        }}
+                                        >
+                                        <MousePointerClick size={40} />
+                                      </motion.div>
+                                    </div>
+
+                                    {/* Bottom decorative line */}
+                                    <motion.div 
+                                      className="absolute bottom-6 left-8 right-8 h-px bg-black"
+                                      initial={{ scaleX: 0 }}
+                                      animate={{ scaleX: 1 }}
+                                      transition={{ duration: 1, delay: 0.5 }}
+                                      />
+                                  </div>
+                                )}
+                              </motion.div>
+             
+                            <motion.div
+                            className="absolute top-0 z-10 border-2 border-black bg-amber-100 w-[420px] h-[520px] flex flex-col items-center justify-center p-4"
+                            variants={bottomCardVariants} // Use the new variants for the bottom card
+                            initial="initial"
+                            animate="animate" // Ensure it remains static
+                            style={{ translateX: "20px" }}
+                            >
+                            
+                                <p className="text-sm font-light">Click the video</p>
+                                <div className="grid grid-cols-2 w-full h-full overflow-y-auto">
+                                  {videos.map((video, index) => (
+                                    <motion.div
+                                    key={video.id}
+                                    className="relative p-2 rounded-md shadow-lg cursor-pointer bg-white hover:shadow-lg transition-shadow duration-300"
+                                    whileHover={{
+                                      scale: 1.05,
+                                      rotateX: 10,
+                                      rotateY: 10,
+                                    }}
+                                    transition={{
+                                      type: "spring",
+                                      stiffness: 150,
+                                      damping: 20,
+                                    }}
+                                    onClick={() => setCurrentVideoIndex(index)}
+                                      >
+                                      <div className="relative w-full pb-[100%] rounded-lg overflow-hidden">
+                                        <video
+                                          ref={(el: HTMLVideoElement | null) => {
+                                            videoRefs.current[index] = el;
+                                          }}
+                                          src={video.video}
+                                          className="absolute inset-0 w-full h-full object-cover"
+                                          />
+                                      </div>
+                                      <p className="font-light italic text-xs text-center mt-2 text-gray-700">{video.title}</p>
+                                    </motion.div>
+                                  ))}
+                                </div>
+                            
+                            </motion.div>
+
               </motion.div>
 
-              <motion.div
-                className="z-1 border-l-2 overflow-hidden border-2 border-black bg-amber-100 w-[420px] h-[520px] absolute flex flex-col items-center justify-center p-4"
-              >
-                  <p className="text-sm font-light">Click the video</p>
-                  <div className="grid grid-cols-2 gap-4 w-full h-full overflow-y-auto p-2">
-                    {videos.map((video, index) => (
-                      <motion.div
-                        key={video.id}
-                        className="relative p-2 rounded-md shadow-lg cursor-pointer bg-white hover:shadow-lg transition-shadow duration-300"
-                        whileHover={{
-                          scale: 1.05,
-                          rotateX: 10,
-                          rotateY: 10,
-                        }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 150,
-                          damping: 20,
-                        }}
-                        onClick={() => setCurrentVideoIndex(index)}
-                      >
-                        <div className="relative w-full pb-[100%] rounded-lg overflow-hidden">
-                          <video
-                            ref={(el: HTMLVideoElement | null) => {
-                              videoRefs.current[index] = el;
-                            }}
-                            src={video.video}
-                            className="absolute inset-0 w-full h-full object-cover"
-                          />
-                          {/* <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleVideoToggle(index);
-                            }}
-                            className="absolute bottom-2 right-2 bg-black/70 hover:bg-black text-white p-2 rounded-full transition-colors duration-200"
-                          >
-                            {playingVideos.has(index) ? <Pause size={16} /> : <Play size={16} />}
-                          </button> */}
-                        </div>
-                        <p className="font-light italic text-xs text-center mt-2 text-gray-700">{video.title}</p>
-                      </motion.div>
-                    ))}
-                  </div>
-              </motion.div>
+              
             </motion.div>
           </motion.div>
 
           <AnimatePresence>
             {currentVideoIndex !== null && (
               <motion.div
-                initial={{ opacity: 0 }}
+              initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 className="fixed inset-0 flex items-center justify-center z-50"
                 onClick={handleClickOutside}
-              >
+                >
                 <motion.div
                   ref={modalRef}
                   initial={{ scale: 0.9, opacity: 0 }}
@@ -382,7 +406,7 @@ export default function Component({ videos,details }: VideoGroupMessageProps) {
                   <button
                     onClick={closeVideo}
                     className="absolute -top-3 -right-3 bg-black hover:bg-gray-700 text-white p-2 rounded-full z-10 transition-colors duration-200"
-                  >
+                    >
                     <X size={20} />
                   </button>
                   
