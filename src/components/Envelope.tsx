@@ -32,11 +32,11 @@ const Envelope: React.FC<EnvelopeProps> = ({ invitation, inviteId,InviteType }) 
   };
 
   const shapeMap = {
-    heart: drawShapes.drawHeart,
-    smiley: drawShapes.drawSmiley,
-    balloon: drawShapes.drawBalloon,
-    default: drawShapes.drawDefaultShape,
-  };
+    date: drawShapes.drawHeart,
+    houseparty: drawShapes.drawSmiley,
+    birthday: drawShapes.drawDefaultShape,
+  } as const;
+  const shape = shapeMap[InviteType as keyof typeof shapeMap] || shapeMap.birthday;
 
   const topFlapVariants = {
     closed: {
@@ -79,6 +79,30 @@ const Envelope: React.FC<EnvelopeProps> = ({ invitation, inviteId,InviteType }) 
     },
   };
 
+  const colorSchemes = {
+  date: {
+    baseGradient: 'bg-gradient-to-br from-pink-500 to-pink-700',
+    leftFlap: 'linear-gradient(135deg, #f687b3 0%, #d53f8c 100%)',
+    rightFlap: 'linear-gradient(225deg, #f687b3 0%, #d53f8c 100%)',
+    topFlap: 'linear-gradient(to bottom, #f687b3 0%, #d53f8c 100%)',
+  },
+  houseparty: {
+    baseGradient: 'bg-gradient-to-br from-purple-500 to-purple-700',
+    leftFlap: 'linear-gradient(135deg, #9f7aea 0%, #6b46c1 100%)',
+    rightFlap: 'linear-gradient(225deg, #9f7aea 0%, #6b46c1 100%)',
+    topFlap: 'linear-gradient(to bottom, #9f7aea 0%, #6b46c1 100%)',
+  },
+  birthday: {
+    baseGradient: 'bg-gradient-to-br from-yellow-500 to-yellow-700',
+    leftFlap: 'linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%)',
+    rightFlap: 'linear-gradient(225deg, #ecc94b 0%, #d69e2e 100%)',
+    topFlap: 'linear-gradient(to bottom, #ecc94b 0%, #d69e2e 100%)',
+  },
+} as const;
+
+const colors = colorSchemes[InviteType as keyof typeof colorSchemes] || colorSchemes.date; // Fallback to "date" scheme if InviteType is invalid
+
+
   const handleClick = () => {
     if (!isOpen) {
       setLetterVisible(true); // Show the letter first
@@ -104,7 +128,7 @@ const Envelope: React.FC<EnvelopeProps> = ({ invitation, inviteId,InviteType }) 
           height={typeof window !== 'undefined' ? window.innerHeight : 200}
           recycle={false}
           numberOfPieces={200}
-          drawShape={shapeMap.heart}
+          drawShape={shape}
           colors={['#FF69B4', '#FF1493', '#C71585', '#DB7093']}
         />
       )}
@@ -137,12 +161,12 @@ const Envelope: React.FC<EnvelopeProps> = ({ invitation, inviteId,InviteType }) 
               className="absolute inset-0"
             >
               {/* Base/Bottom of envelope */}
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg shadow-xl" />
+              <div className={`absolute inset-0 ${colors.baseGradient} rounded-lg shadow-xl`} />
               {/* Left Flap */}
               <div
                 className="absolute left-0 top-0 w-[300px] h-[350px]"
                 style={{
-                  background: 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)',
+                  background: colors.leftFlap,
                   clipPath: 'polygon(0 0, 0% 100%, 100% 50%)',
                 }}
               />
@@ -150,7 +174,7 @@ const Envelope: React.FC<EnvelopeProps> = ({ invitation, inviteId,InviteType }) 
               <div
                 className="absolute right-0 top-0 w-[300px] h-[350px]"
                 style={{
-                  background: 'linear-gradient(225deg, #4a5568 0%, #2d3748 100%)',
+                  background: colors.rightFlap,
                   clipPath: 'polygon(100% 0, 100% 100%, 0% 50%)',
                 }}
               />
@@ -161,7 +185,7 @@ const Envelope: React.FC<EnvelopeProps> = ({ invitation, inviteId,InviteType }) 
                 initial="closed"
                 animate={isOpen ? "open" : "closed"}
                 style={{
-                  background: 'linear-gradient(to bottom, #4a5568 0%, #2d3748 100%)',
+                  background: colors.topFlap,
                   clipPath: 'polygon(0 0, 50% 50%, 100% 0)',
                   transformStyle: 'preserve-3d',
                 }}
