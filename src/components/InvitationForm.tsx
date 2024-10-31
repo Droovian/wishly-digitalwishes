@@ -39,8 +39,10 @@ const inviteSchema = z.object({
 })
 
 type InviteFormData = z.infer<typeof inviteSchema>
-
-export default function InviteForm() {
+interface InviteType{
+inviteType:string
+}
+export default function InviteForm({inviteType}:InviteType) {
   const { user } = useUser();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = useForm<InviteFormData>({
@@ -65,6 +67,7 @@ export default function InviteForm() {
     const inviteData = {
       ...data,
       userId: user.id,
+      inviteType
     }
 
     try {
@@ -77,6 +80,7 @@ export default function InviteForm() {
       form.reset()
       
     } catch (error) {
+      console.log(error)
       setIsLoading(false);
       toast.error("Error creating invitation.")
     }
