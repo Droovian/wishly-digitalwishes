@@ -1,7 +1,7 @@
+// components/AppSidebar.tsx
 "use client";
 import Link from "next/link";
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
-
+import { Home, Inbox } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,9 +11,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarHeader,
-} from "@/components/ui/sidebar"
-import { useRouter } from 'next/navigation';
+} from "@/components/ui/sidebar";
+import { useRouter } from "next/navigation";
+import { useUIContext } from "../app/(spaces)/UiContext";
 
 // Menu items.
 const items = [
@@ -27,17 +27,17 @@ const items = [
     url: "/dashboard",
     icon: Inbox,
   },
-  
-  
-]
+];
 
 export function AppSidebar() {
+  const { isSidebarVisible } = useUIContext();
+  const router = useRouter();
 
-    const router = useRouter();
+  // Hide sidebar if it's disabled in the context
+  if (!isSidebarVisible) return null;
 
   return (
     <Sidebar variant="inset" className="mt-20">
-        
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -58,5 +58,5 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }

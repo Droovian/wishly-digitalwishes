@@ -1,42 +1,34 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import Link from 'next/link'
-import React, { useState } from 'react'
-import { UserButton, SignedIn, SignedOut, SignInButton, SignOutButton } from '@clerk/nextjs'
-import { useRouter } from 'next/navigation'
-import { Menu, X } from 'lucide-react'
-
-import { Button } from "@/components/ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import React, { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useRouter, usePathname } from "next/navigation";
+import { Menu } from "lucide-react";
+import { SignedIn, SignedOut, SignInButton, SignOutButton } from "@clerk/nextjs";
 
 export default function Navbar() {
-  const router = useRouter()
-  const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname();  // Get current pathname
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = () => setIsOpen(!isOpen)
+  // Function to toggle menu
+  const toggleMenu = () => setIsOpen(!isOpen);
 
   const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-    <Link
-      href={href}
-      className="text-gray-600 hover:text-gray-800 transition-colors"
-      onClick={() => setIsOpen(false)}
-    >
+    <Link href={href} className="text-gray-600 hover:text-gray-800 transition-colors" onClick={() => setIsOpen(false)}>
       {children}
     </Link>
-  )
+  );
+
+  // Hide navbar if the current route contains '/space/'
+  if (pathname.includes("/space/")) return null;
 
   return (
     <nav className="w-full h-20 bg-white border-b border-gray-200">
       <div className="flex items-center justify-between w-11/12 mx-auto h-full">
-        <button onClick={() => { router.back() }} className="font-bold text-xl sm:text-3xl text-black">
+        <button onClick={() => router.back()} className="font-bold text-xl sm:text-3xl text-black">
           Invicollab
         </button>
 
@@ -50,7 +42,7 @@ export default function Navbar() {
           </div>
           <SignedIn>
             <SignOutButton>
-                <Button variant="destructive">Sign out</Button>
+              <Button variant="destructive">Sign out</Button>
             </SignOutButton>
           </SignedIn>
           <SignedOut>
@@ -60,6 +52,7 @@ export default function Navbar() {
           </SignedOut>
         </div>
 
+        {/* Mobile Navigation */}
         <div className="sm:hidden">
           <Sheet>
             <SheetTrigger asChild>
@@ -91,5 +84,5 @@ export default function Navbar() {
         </div>
       </div>
     </nav>
-  )
+  );
 }
