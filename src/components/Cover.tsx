@@ -5,9 +5,19 @@ import { Cover } from "@/components/ui/cover"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Share2, Calendar, Users, Sparkles, Gift, Rocket, Heart } from "lucide-react"
+import { useState } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { motion } from "framer-motion"
 
 export function HomePage() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const router = useRouter()
   
   const features = [
@@ -101,7 +111,7 @@ export function HomePage() {
         </div>
       </div>
 
-      <div className="bg-neutral-50 dark:bg-neutral-900 py-16 rounded-xl">
+      {/* <div className="bg-neutral-50 dark:bg-neutral-900 py-16 rounded-xl">
         <h2 className="text-3xl font-bold text-center mb-12">What Our Users Say</h2>
         <div className="grid md:grid-cols-2 gap-8 px-8">
           {testimonials.map((testimonial, index) => (
@@ -125,7 +135,7 @@ export function HomePage() {
             </motion.div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -139,11 +149,22 @@ export function HomePage() {
           We will regularly update our platform with new templates, features, and integrations based on your feedback.
         </p>
 
-        <Button
-        
-        >
-          Contact Us
-        </Button>
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <Button>Contact Us</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Contact Us</DialogTitle>
+              <DialogDescription>
+                Feel free to reach out to us at the following email address:
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-center text-lg font-medium">dhruvnaik21@gmail.com</p>
+            </div>
+          </DialogContent>
+        </Dialog>
         
       </motion.div>
     </div>

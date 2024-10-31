@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileUploader } from "./FileUploader"; // Import your custom FileUploader component
 import { uploadVideoWithThumbnail } from "@/appwrite/appwrite";
+import { useRouter } from "next/navigation";
 // Define schema for form validation using zod
 const videoSchema = z.object({
   creatorId: z.string(),
@@ -37,6 +38,7 @@ interface VideoProps {
 const VideoUploadForm: React.FC<VideoProps> = ({ spaceId }) =>  {
 
   const { userId } = useAuth();
+  const router = useRouter();
   
   const form = useForm<VideoFormData>({
     resolver: zodResolver(videoSchema),
@@ -60,9 +62,13 @@ const VideoUploadForm: React.FC<VideoProps> = ({ spaceId }) =>  {
       if(data.video && data.title){
         const response = await uploadVideoWithThumbnail(userId, data.title, data.video, spaceId); 
         console.log('Video data successfully stored in Appwrite:', response);
+        toast.success("Video uploaded successfully!");
+
+        router.push('/dashboard');
       }
       else{
         console.log('An error occured while uploading video');
+        toast.error("An error occurred while uploading video.");
         
       }
     } catch (error: any) {
