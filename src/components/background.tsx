@@ -147,68 +147,7 @@ function BirthdayBackground() {
   }, [poppers])
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400">
-      {balloons.map((balloon) => (
-        <motion.div
-          key={`balloon-${balloon.id}`}
-          className="absolute bottom-0"
-          style={{ left: `${balloon.x}%` }}
-          initial={{ y: '100%' }}
-          animate={{ y: '-120%' }}
-          transition={{
-            duration: Math.random() * 10 + 15,
-            repeat: Infinity,
-            repeatType: 'loop',
-            ease: 'easeInOut'
-          }}
-        >
-          <svg width="40" height="50" viewBox="0 0 40 50" fill={balloon.color}>
-            <path d="M20 0C9 0 0 9 0 20C0 31 9 40 20 40C31 40 40 31 40 20C40 9 31 0 20 0ZM20 45L25 50H15L20 45Z" />
-          </svg>
-        </motion.div>
-      ))}
-
-      {confetti.map((particle) => (
-        <motion.div
-          key={`confetti-${particle.id}`}
-          className="absolute w-2 h-2 rounded-full"
-          style={{
-            left: `${particle.x}%`,
-            top: `${particle.y}%`,
-            backgroundColor: particle.color
-          }}
-          initial={{ opacity: 1, scale: 1 }}
-          animate={{
-            y: ['0%', '100%'],
-            x: ['-10%', '10%'],
-            rotate: [0, 360],
-            opacity: [1, 0],
-          }}
-          transition={{
-            duration: Math.random() * 3 + 2,
-            repeat: 1,
-            ease: 'easeInOut'
-          }}
-        />
-      ))}
-
-      {poppers.map((popper) => (
-        <motion.div
-          key={`popper-${popper.id}`}
-          className="absolute w-6 h-6 bg-yellow-400 rounded-full"
-          style={{ left: `${popper.x}%`, top: `${popper.y}%` }}
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 45, -45, 0],
-          }}
-          transition={{
-            duration: 0.5,
-            repeat: Infinity,
-            repeatType: 'reverse',
-            ease: 'easeInOut',
-          }}
-        />
-      ))}
+    <div className="fixed inset-0 overflow-hidden bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400">      
     </div>
   )
 }
