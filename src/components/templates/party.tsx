@@ -114,7 +114,7 @@ export default function PartyInvite({ invitation, isOpen, inviteId }: PartyInvit
     <motion.div className="flex flex-col items-center justify-center"
       variants={cardMovement}>
       <motion.div
-        className="relative z-20 border-2 border-black bg-gradient-to-br from-purple-400 to-pink-500 w-[420px] h-[520px] overflow-hidden rounded-lg shadow-2xl"
+        className="relative z-20 border-2 border-black bg-gradient-to-br from-purple-400 to-pink-500 w-[420px] h-[520px] overflow-hidden"
         variants={topCardVariants}
         initial="closed"
         animate={controls}
@@ -169,7 +169,7 @@ export default function PartyInvite({ invitation, isOpen, inviteId }: PartyInvit
       </motion.div>
 
       <motion.div
-        className="absolute top-0 left-0 z-10 border-2 border-black bg-white w-[420px] h-[520px] flex flex-col items-center justify-center p-4"
+        className="absolute top-0 z-10 border-2 border-black bg-white w-[420px] h-[520px] flex flex-col items-center justify-center p-4"
         variants={bottomCardVariants}
         initial="initial"
         animate="animate"

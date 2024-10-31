@@ -28,6 +28,8 @@ import { useUser } from "@clerk/nextjs"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import { createInvite } from "@/appwrite/appwrite"
+import { useRouter } from "next/navigation"
+
 const inviteSchema = z.object({
   hostName: z.string().min(2, { message: "Host name must be at least 2 characters." }),
   inviteeName: z.string().optional(),
@@ -35,7 +37,6 @@ const inviteSchema = z.object({
   eventDate: z.string().min(1, { message: "Event date is required." }),
   eventTime: z.string().optional(),
   location: z.string().optional(),
-  template: z.string().min(1, { message: "Please select a template." }),
 })
 
 type InviteFormData = z.infer<typeof inviteSchema>
@@ -45,6 +46,7 @@ inviteType:string
 export default function InviteForm({inviteType}:InviteType) {
   const { user } = useUser();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
   const form = useForm<InviteFormData>({
     resolver: zodResolver(inviteSchema),
     defaultValues: {
@@ -52,7 +54,6 @@ export default function InviteForm({inviteType}:InviteType) {
       inviteeName: "",
       customMessage: "",
       eventDate: "",
-      template: "",
       location: "",
       eventTime: "",
     },
@@ -78,6 +79,7 @@ export default function InviteForm({inviteType}:InviteType) {
       toast.success("Invitation created successfully.")
       setIsLoading(false);
       form.reset()
+      router.push("/dashboard");
       
     } catch (error) {
       console.log(error)
@@ -132,30 +134,6 @@ export default function InviteForm({inviteType}:InviteType) {
                   <FormControl>
                     <Textarea placeholder="Enter your custom message" {...field} />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="template"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Theme</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a Theme" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Modern">Modern</SelectItem>
-                      <SelectItem value="Retro">Retro</SelectItem>
-                      <SelectItem value="Comic">Comic book</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>Select the look and feel of your invite.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

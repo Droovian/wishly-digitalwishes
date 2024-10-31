@@ -12,7 +12,7 @@ export function OccasionCards() {
       id: 'birthday'
     },
     {
-      title: "Date night",
+      title: "Valentine's Day",
       src: DateImage,
       textColor: "#e11d48",
       id: 'date'

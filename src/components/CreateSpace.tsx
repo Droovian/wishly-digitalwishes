@@ -31,7 +31,6 @@ const spaceSchema = z.object({
   age: z.string(),
   createdBy: z.string().min(2, { message: "Name must be at least 2 characters." }),
   customMessage: z.string().min(10, { message: "Message must be at least 10 characters." }),
-  addVideo: z.boolean(),
 });
 
 type SpaceFormData = z.infer<typeof spaceSchema>;
@@ -47,7 +46,6 @@ const CreateSpace = () => {
       createdBy: "",
       customMessage: "",
       age: "",
-      addVideo: false,
     },
   });
 
@@ -58,10 +56,6 @@ const CreateSpace = () => {
       setLoading(true);
       const response = await createVideoSpace(data,user!.id);
       setLoading(false);
-
-      if(!data.addVideo){
-        router.push('/');
-      }
 
       router.push("/dashboard")
       console.log("Video space created:", response);
@@ -144,25 +138,6 @@ const CreateSpace = () => {
               )}
             />
 
-          <FormField
-              control={form.control}
-              name="addVideo"
-              render={({ field }) => (
-                <FormItem className="flex items-center space-x-3">
-                  <FormControl>
-                    <Checkbox
-                      id="addVideos"
-                      checked={field.value}
-                      onCheckedChange={(checked) => field.onChange(checked)}
-                      className="flex"
-                    />
-                  </FormControl>
-                  <FormLabel htmlFor="addVideos" className="text-sm">
-                    Add videos?
-                  </FormLabel>
-                </FormItem>
-              )}
-            />
             {/* Submit Button */}
             <Button type="submit" className="w-full" disabled={loading}>
               Submit

@@ -160,7 +160,6 @@ export const createVideoSpace = async (spaceData: {
   createdBy: string,
   customMessage: string,
   age: string,
-  addVideo: boolean,
 }, userId: string) => {
   try {
     const response = await databases.createDocument(
@@ -173,7 +172,6 @@ export const createVideoSpace = async (spaceData: {
         creatorId: userId,
         customMessage: spaceData.customMessage,
         age: spaceData.age,
-        addVideo: spaceData.addVideo,
       }
     );
 
@@ -289,7 +287,6 @@ export const createInvite = async (inviteData: {
   eventDate: string;
   eventTime?: string;
   location?: string;
-  template: string;
   userId: string
   inviteType:string
 }) => {

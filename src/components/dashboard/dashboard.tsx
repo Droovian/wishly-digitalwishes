@@ -46,6 +46,13 @@ export default function Dashboard() {
     setIsModalOpen(true);
   }
 
+  const formInvitesLink = (InviteId: string) => {
+    const invitationLink = `http://localhost:3000/invites/${InviteId}`;
+    setCurrentLink(invitationLink);
+    setLinkType('invitation');
+    setIsModalOpen(true);
+  }
+
   const handleViewRsvpList = async (inviteId: string) => {
     try {
       const rsvpList = await viewRsvpList(inviteId);
@@ -173,7 +180,7 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardFooter>
                   <div className='flex space-x-4'>
-                    <Button variant="outline" onClick={() => formInviLink(invitation?.$id)}>
+                    <Button variant="outline" onClick={() => formInvitesLink(invitation?.$id)}>
                       <Mail className="mr-2 h-4 w-4" /> Send
                     </Button>
                     <Button variant='outline' onClick={() => handleViewRsvpList(invitation.$id)}>
