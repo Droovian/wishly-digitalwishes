@@ -3,9 +3,11 @@ import BookInvitation from "@/components/invitations/BookInvitation";
 import AnimatedEnvelope from "@/components/Envelope";
 import { InvitationDetail } from "@/lib/data";
 import {Background} from "@/components/background";
+
 export default async function Invites({ params }: { params: { id: string } }) {
 
     const invite = await getInviteByDocumentId(params.id);
+
     const data :InvitationDetail = {
         hostName : invite.hostName,
         inviteeName: invite.inviteeName,

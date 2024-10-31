@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, useSpring, useAnimation, AnimatePresence } from "framer-motion";
-import { Heart } from "lucide-react";
+import { Heart, Calendar, Clock, MapPin, User } from "lucide-react";
 import { InvitationDetail } from "@/lib/data";
 import { addToRsvpList } from "@/appwrite/appwrite";
 
@@ -14,7 +14,7 @@ interface ValentineInviteProps {
 
 export default function ValentineInvite({ invitation, isOpen, inviteId }: ValentineInviteProps) {
   const [isRsvpSubmitted, setIsRsvpSubmitted] = useState(false);
-  const [response, setResponse] = useState<"yes" | "no">("no");
+  const [response, setResponse] = useState<"yes" | "no" | null>(null);
   const scale = useSpring(1, { bounce: 0 });
   const [rotateCard, setRotateCard] = useState<boolean>(false);
   const controls = useAnimation();
@@ -42,23 +42,6 @@ export default function ValentineInvite({ invitation, isOpen, inviteId }: Valent
     animate: { opacity: 1, transition: { duration: 0.5 } }
   };
 
-  const handleRsvp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!response.trim()) {
-      alert("Please select an option to RSVP.");
-      return;
-    }
-
-    try {
-      await addToRsvpList(inviteId, response);
-      setIsRsvpSubmitted(true);
-      alert(`Thank you for your response.`);
-    } catch (error) {
-      alert("Error submitting RSVP. Please try again.");
-      console.error("RSVP error:", error);
-    }
-  };
-
   const formattedEventDate = new Date(invitation.eventDate).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -71,10 +54,42 @@ export default function ValentineInvite({ invitation, isOpen, inviteId }: Valent
     hour12: true,
   });
 
+  const handleResponse = async (choice: "yes" | "no") => {
+    setResponse(choice);
+    setIsRsvpSubmitted(true);
+  };
+
+  const Confetti = () => {
+    return (
+      <div className="fixed inset-0 pointer-events-none">
+        {[...Array(50)].map((_, index) => (
+          <motion.div
+            key={index}
+            className="absolute w-2 h-2 bg-red-500 rounded-full"
+            initial={{
+              top: "100%",
+              left: `${Math.random() * 100}%`,
+              scale: 0,
+            }}
+            animate={{
+              top: "-10%",
+              scale: [0, 1, 0],
+              transition: {
+                duration: Math.random() * 2 + 1,
+                repeat: Infinity,
+                repeatDelay: Math.random() * 3,
+              },
+            }}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <motion.div variants={{ closed: { opacity: 1 }, open: { opacity: 1, translateX: "250px" } }}>
       <motion.div
-        className="relative z-20 border-2 border-black bg-amber-100 w-[420px] h-[520px] overflow-hidden"
+        className="relative z-20 border-4 border-pink-300 bg-gradient-to-br from-pink-100 to-red-100 w-[420px] h-[520px] overflow-hidden shadow-lg"
         variants={topCardVariants}
         initial="closed"
         animate={controls}
@@ -82,136 +97,136 @@ export default function ValentineInvite({ invitation, isOpen, inviteId }: Valent
         onClick={handleCardClick}
       >
         {rotateCard ? (
-          <h1 className="text-4xl font-bold text-gray-800"> {/* Content when card is open */}</h1>
+          <div className="h-full w-full p-8 flex flex-col items-center justify-center bg-gradient-to-br from-red-100 to-pink-100"
+          style={{ transform: 'rotateY(180deg)' }}>
+            <AnimatePresence>
+              {response === null ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-center"
+                >
+                  <h1 className="text-4xl font-bold text-red-600 mb-6">Will You Be My Valentine?</h1>
+                  <div className="flex space-x-4">
+                    <button 
+                      className="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition duration-300"
+                      onClick={() => handleResponse("yes")}
+                    >
+                      Yes
+                    </button>
+                    <button 
+                      className="px-6 py-2 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-400 transition duration-300"
+                      onClick={() => handleResponse("no")}
+                    >
+                      No
+                    </button>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="text-center"
+                >
+                  <h2 className="text-3xl font-bold mb-4 text-red-600">
+                    {response === "yes" ? "Yay! Can't wait to see you!" : "🥺"}
+                  </h2>
+                  <p className="text-xl text-gray-700">
+                    {response === "yes" ? "Thank you for accepting!" : ""}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         ) : (
           <div className="relative h-full w-full p-8 flex flex-col items-center justify-center">
             <motion.div 
-              className="absolute top-6 left-8 right-8 h-px bg-black"
+              className="absolute top-6 left-8 right-8 h-px bg-pink-300"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 1, delay: 0.5 }}
             />
             <div className="relative flex flex-col items-center space-y-8 mt-3">
               <motion.div
-                className="relative flex-1 bg-purple-300"
+                className="relative flex-1 bg-transparent w-full h-full"
                 style={{ perspective: 1000 }}
               >
                 <motion.div
-                  className="absolute inset-0 flex flex-1 justify-center items-center"
+                  className="inset-0 flex flex-1 justify-center items-center"
                   animate={{
                     rotateY: 0,
                   }}
                   transition={{ duration: 0.6 }}
                   style={{ transformOrigin: "left center" }}
                 >
-                  <div className="relative h-full w-full p-4 flex flex-col items-center justify-center">
-                    {[...Array(10)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="absolute text-red-200"
-                        initial={{
-                          top: `${Math.random() * 100}%`,
-                          left: `${Math.random() * 100}%`,
-                          scale: Math.random() * 0.3 + 0.7,
-                        }}
-                        animate={{
-                          y: [0, -15, 0],
-                          opacity: [0.7, 1, 0.7],
-                          scale: [1, 1.1, 1],
-                        }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: Math.random() * 3 + 2,
-                          ease: "easeInOut",
-                        }}
-                      >
-                        <Heart />
-                      </motion.div>
-                    ))}
-                    <p className="text-sm text-gray-700">Dear {invitation.inviteeName},</p>
-                    <p className="text-xs text-gray-600 italic">{invitation.customMessage}</p>
+                  <div className="relative h-full w-full flex flex-col items-center justify-center">
+                    <p className="text-2xl font-serif text-red-600 mb-4">Dear {invitation.inviteeName},</p>
+                    <p className="text-lg text-gray-700 italic text-center">Here's something special for you...</p>
                   </div>
                 </motion.div>
               </motion.div>
             </div>
+            <motion.div 
+              className="absolute bottom-6 left-8 right-8 h-px bg-pink-300"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 1, delay: 0.5 }}
+            />
           </div>
         )}
       </motion.div>
       
       <motion.div
-        className="absolute top-0 left-0 z-10 border-2 border-black bg-amber-100 w-[420px] h-[520px] flex flex-col items-center justify-center p-4"
+        className="absolute top-0 left-0 z-10 border-4 border-pink-300 bg-gradient-to-br from-red-100 to-pink-100 w-[420px] h-[520px] flex flex-col p-8 shadow-lg"
         variants={bottomCardVariants}
         initial="initial"
         animate="animate"
         style={{ translateX: "20px" }}
       >
         <div className="text-center">
-          <Heart className="w-8 h-8 text-red-500 mx-auto" />
-          <h2 className="text-xl font-bold text-red-600">Be My Valentine</h2>
-          <div className="pt-2 text-gray-700 text-sm">
-            <p>{formattedEventDate}</p>
-            <p>{formattedEventTime}</p>
+          <Heart className="w-16 h-16 text-red-500 mx-auto mb-6" fill="currentColor" />
+          <p className="text-lg text-gray-700 mb-6">{invitation.customMessage}</p>
+          <div className="space-y-4 text-gray-700">
+            <div className="flex items-center justify-center">
+              <Calendar className="w-5 h-5 mr-2 text-red-400" />
+              <p className="text-sm">{formattedEventDate}</p>
+            </div>
+            <div className="flex items-center justify-center">
+              <Clock className="w-5 h-5 mr-2 text-red-400" />
+              <p className="text-sm">{formattedEventTime}</p>
+            </div>
+          </div>
+          <div className="absolute flex bottom-5 left-5">
+            <MapPin className="w-5 h-5 mr-2 text-red-400" />
             <a
               href={`https://www.google.com/maps/place/${encodeURIComponent(invitation.location)}`}
               rel="noopener noreferrer"
               target="_blank"
+              className="text-sm text-red-600 hover:underline"
             >
               {invitation.location}
             </a>
-            <p>From: {invitation.hostName}</p>
           </div>
-
-          <AnimatePresence>
-            {!isRsvpSubmitted ? (
-              <motion.div
-                className="mt-4 space-y-2"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ delay: 0.5, duration: 0.3 }}
-              >
-                <div className="flex justify-center space-x-4 text-sm">
-                  <label className="inline-flex items-center">
-                    <input
-                      type="radio"
-                      className="form-radio text-red-500 h-4 w-4"
-                      name="rsvp"
-                      value="yes"
-                      onChange={() => setResponse("yes")}
-                    />
-                    <span className="ml-2 text-red-600">Yes, I'd love to!</span>
-                  </label>
-                  <label className="inline-flex items-center">
-                    <input
-                      type="radio"
-                      className="form-radio text-gray-500 h-4 w-4"
-                      name="rsvp"
-                      value="no"
-                      onChange={() => setResponse("no")}
-                    />
-                    <span className="ml-2 text-gray-600">No, I can't make it</span>
-                  </label>
-                </div>
-                <button
-                  onClick={handleRsvp}
-                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-4 rounded-full transition duration-300 w-1/2 text-sm"
-                >
-                  Send RSVP
-                </button>
-              </motion.div>
-            ) : (
-              <motion.p
-                className="text-green-600 font-semibold mt-2 text-sm"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              >
-                Thank you for your RSVP!
-              </motion.p>
-            )}
-          </AnimatePresence>
+          <div className="absolute flex bottom-5 right-5">
+            <User className="w-5 h-5 mr-2 text-red-400" />
+            <p className="text-sm text-red-600">From: {invitation.hostName}</p>
+          </div>
         </div>
       </motion.div>
+      
+      {response === "yes" && <Confetti />}
+      
+      {response === "no" && (
+        <motion.div
+          className=""
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1 }}
+        />
+      )}
     </motion.div>
   );
 }

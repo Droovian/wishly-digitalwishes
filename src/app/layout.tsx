@@ -19,7 +19,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "wishly",
+  title: "Invicollab",
   description: "Platform for creating digital invitations",
 };
 

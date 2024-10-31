@@ -12,9 +12,8 @@ export default function VideoUploadContainer({ params }: { params: { spaceId: st
   }
 
   return (
-    <div className="p-4 bg-white shadow rounded-lg">
+    <div className="bg-white shadow rounded-lg flex flex-col justify-center items-center h-screen">
       <h2 className="text-lg font-semibold mb-4">Upload a Video</h2>
-      {/* Pass spaceId to VideoUploadForm */}
       <VideoUploadForm spaceId={spaceId} />
     </div>
   );

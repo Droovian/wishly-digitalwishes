@@ -9,11 +9,10 @@ import { Menu } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, SignOutButton } from "@clerk/nextjs";
 
 export default function Navbar() {
-  const pathname = usePathname();  // Get current pathname
+  const pathname = usePathname(); 
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Function to toggle menu
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
@@ -22,7 +21,6 @@ export default function Navbar() {
     </Link>
   );
 
-  // Hide navbar if the current route contains '/space/'
   if (pathname.includes("/space/")) return null;
 
   return (
@@ -32,14 +30,7 @@ export default function Navbar() {
           Invicollab
         </button>
 
-        {/* Desktop Navigation */}
-        <div className="hidden sm:flex items-center space-x-4">
-          <div className="border rounded-xl p-3">
-            <ul className="flex font-bold text-gray-600 text-sm space-x-4">
-              <NavLink href="/create">Create a wish</NavLink>
-              <NavLink href="/about">About</NavLink>
-            </ul>
-          </div>
+        <div className="hidden sm:flex items-center space-x-4">         
           <SignedIn>
             <SignOutButton>
               <Button variant="destructive">Sign out</Button>
@@ -52,7 +43,6 @@ export default function Navbar() {
           </SignedOut>
         </div>
 
-        {/* Mobile Navigation */}
         <div className="sm:hidden">
           <Sheet>
             <SheetTrigger asChild>

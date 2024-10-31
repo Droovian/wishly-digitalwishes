@@ -176,7 +176,7 @@ export default function Dashboard() {
             {invitations.map((invitation) => (
               <Card key={invitation.$id}>
                 <CardHeader>
-                  <CardTitle>To: {invitation.hostName}</CardTitle>
+                  <CardTitle>To: {invitation.inviteeName || 'Anon'}</CardTitle>
                 </CardHeader>
                 <CardFooter>
                   <div className='flex space-x-4'>
@@ -186,7 +186,7 @@ export default function Dashboard() {
                     <Button variant='outline' onClick={() => handleViewRsvpList(invitation.$id)}>
                       View RSVP list
                     </Button>
-                    <Trash color='red' onClick={() => handleDeleteInvite(invitation?.$id)} className="mt-3 mr-2 h-4 w-4" />
+                    <Trash color='red' onClick={() => handleDeleteInvite(invitation?.$id)} className="hover:cursor-pointer mt-3 mr-2 h-4 w-4" />
                   </div>
                 </CardFooter>
               </Card>
@@ -240,7 +240,7 @@ export default function Dashboard() {
                         <Button variant="outline" onClick={() => router.push(`/add/${group.$id}`)}>
                           Add Video
                         </Button>
-                        <Trash color='red' onClick={() => handleDeleteSpace(group.$id)} className="mt-3 mr-2 h-4 w-4" />
+                        <Trash color='red' onClick={() => handleDeleteSpace(group.$id)} className="hover:cursor-pointer mt-3 mr-2 h-4 w-4" />
                         <ExternalLink className="mt-3 mr-2 h-4 w-4 hover:cursor-pointer" onClick={() => formInviLink(group.$id)} />
                       </div>
                     </CardContent>
@@ -250,7 +250,7 @@ export default function Dashboard() {
                 <div className="text-center py-10">No video groups available.</div>
               )}
               <Card className="flex items-center justify-center">
-                <Button variant="ghost" onClick={() => router.push('/create-group')}><Plus className="mr-2 h-4 w-4" /> Create New Video Group</Button>
+                <Button variant="ghost" onClick={() => router.push('/create')}><Plus className="mr-2 h-4 w-4" /> Create New Video Group</Button>
               </Card>
             </div>
           )}

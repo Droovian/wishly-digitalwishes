@@ -1,5 +1,4 @@
-import Image from "next/image";
-import { GridBackgroundDemo } from "@/components/GridBackground";
+import { Landing } from "@/components/GridBackground";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { storeUserInDatabase } from "@/appwrite/appwrite";
 
@@ -17,7 +16,7 @@ export default async function Home() {
 
   return (
     <>
-      <GridBackgroundDemo />
+      <Landing />
     </>
   );
 }
