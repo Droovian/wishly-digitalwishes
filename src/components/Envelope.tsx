@@ -93,10 +93,10 @@ const Envelope: React.FC<EnvelopeProps> = ({ invitation, inviteId,InviteType }) 
     topFlap: 'linear-gradient(to bottom, #9f7aea 0%, #6b46c1 100%)',
   },
   birthday: {
-    baseGradient: 'bg-gradient-to-br from-yellow-500 to-yellow-700',
-    leftFlap: 'linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%)',
-    rightFlap: 'linear-gradient(225deg, #ecc94b 0%, #d69e2e 100%)',
-    topFlap: 'linear-gradient(to bottom, #ecc94b 0%, #d69e2e 100%)',
+    baseGradient: 'bg-gradient-to-br from-gray-700 to-gray-900',
+    leftFlap: 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)',
+    rightFlap: 'linear-gradient(225deg, #4a5568 0%, #2d3748 100%)',
+    topFlap: 'linear-gradient(to bottom, #4a5568 0%, #2d3748 100%)',
   },
 } as const;
 
