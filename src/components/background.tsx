@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 function DateBackground() {
   const [hearts, setHearts] = useState<{ id: number; x: number; size: number }[]>([])
@@ -116,55 +116,38 @@ function PartyBackground() {
 }
 const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FDCB6E', '#6C5CE7', '#55E6C1']
 
-export function BirthdayBackground() {
-  const [balloons, setBalloons] = useState<{ id: number; x: number; color: string }[]>([])
+function BirthdayBackground() {
   const [confetti, setConfetti] = useState<{ id: number; x: number; y: number; color: string }[]>([])
-  const [poppers, setPoppers] = useState<{ id: number; x: number; y: number }[]>([])
+  
+  const balloons = useMemo(() => Array.from({ length: 8 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    color: colors[Math.floor(Math.random() * colors.length)]
+  })), [])
+
+  const poppers = useMemo(() => Array.from({ length: 3 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 80 + 10,
+    y: Math.random() * 80 + 10
+  })), [])
 
   useEffect(() => {
-    // Create balloons
-    const newBalloons = Array.from({ length: 10 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      color: colors[Math.floor(Math.random() * colors.length)]
-    }))
-    setBalloons(newBalloons)
-
-    // Create initial confetti
-    const newConfetti = Array.from({ length: 50 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      color: colors[Math.floor(Math.random() * colors.length)]
-    }))
-    setConfetti(newConfetti)
-
-    // Create party poppers
-    const newPoppers = Array.from({ length: 5 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 80 + 10, // Ensure poppers are not too close to the edges
-      y: Math.random() * 80 + 10
-    }))
-    setPoppers(newPoppers)
-
-    // Trigger party poppers at intervals
     const popperInterval = setInterval(() => {
-      const popperIndex = Math.floor(Math.random() * newPoppers.length)
-      const newConfettiFromPopper = Array.from({ length: 20 }, (_, i) => ({
-        id: confetti.length + i,
-        x: newPoppers[popperIndex].x,
-        y: newPoppers[popperIndex].y,
+      const popperIndex = Math.floor(Math.random() * poppers.length)
+      const newConfettiFromPopper = Array.from({ length: 10 }, (_, i) => ({
+        id: Date.now() + i,
+        x: poppers[popperIndex].x,
+        y: poppers[popperIndex].y,
         color: colors[Math.floor(Math.random() * colors.length)]
       }))
-      setConfetti(prev => [...prev, ...newConfettiFromPopper])
+      setConfetti(prev => [...prev.slice(-40), ...newConfettiFromPopper])
     }, 2000)
 
     return () => clearInterval(popperInterval)
-  }, [])
+  }, [poppers])
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400">
-      {/* Balloons */}
       {balloons.map((balloon) => (
         <motion.div
           key={`balloon-${balloon.id}`}
@@ -185,7 +168,6 @@ export function BirthdayBackground() {
         </motion.div>
       ))}
 
-      {/* Confetti */}
       {confetti.map((particle) => (
         <motion.div
           key={`confetti-${particle.id}`}
@@ -204,14 +186,12 @@ export function BirthdayBackground() {
           }}
           transition={{
             duration: Math.random() * 3 + 2,
-            repeat: Infinity,
-            repeatType: 'loop',
+            repeat: 1,
             ease: 'easeInOut'
           }}
         />
       ))}
 
-      {/* Party Poppers */}
       {poppers.map((popper) => (
         <motion.div
           key={`popper-${popper.id}`}
