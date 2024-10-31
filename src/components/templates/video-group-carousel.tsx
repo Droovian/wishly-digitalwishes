@@ -9,15 +9,16 @@ import Image from "next/image";
 import AnimatedBirthdayCake from "../birthday-cake";
 interface Video {
   id: string;
-  url: string;
+  video: string;
   title: string;
 }
 
 interface VideoGroupMessageProps {
   videos: Video[];
+  details: any
 }
 
-export default function Component({ videos }: VideoGroupMessageProps) {
+export default function Component({ videos,details }: VideoGroupMessageProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
   const [rotateCard, setRotateCard] = useState<boolean>(false);
@@ -248,8 +249,12 @@ export default function Component({ videos }: VideoGroupMessageProps) {
                 onClick={handleCardClick}
               >
                 {rotateCard ? (
-                  <h1 className="text-4xl font-bold text-gray-800">
-                  </h1>
+                 <div className="h-full w-full p-8 flex flex-col items-center justify-center" style={{ transform: 'rotateY(180deg)' }}>
+                 <p className="text-sm font-bold text-gray-800">
+                   {details?.customMessage}
+                 </p>
+               </div>
+                  
                 ) : (
                   <div className="relative h-full w-full p-8 flex flex-col items-center justify-center">
                     {/* Subtle decorative line */}
@@ -269,7 +274,7 @@ export default function Component({ videos }: VideoGroupMessageProps) {
                         transition={{ duration: 0.8 }}
                       >
                         <h2 className="text-sm font-light tracking-widest mt-2 uppercase">
-                          Dear Dhruv
+                          Dear {details?.name}
                         </h2>
                         <h1 className="text-4xl font-serif text-gray-800">
                          Happy Birthday!
@@ -334,7 +339,7 @@ export default function Component({ videos }: VideoGroupMessageProps) {
                             ref={(el: HTMLVideoElement | null) => {
                               videoRefs.current[index] = el;
                             }}
-                            src={video.url}
+                            src={video.video}
                             className="absolute inset-0 w-full h-full object-cover"
                           />
                           {/* <button
@@ -388,7 +393,7 @@ export default function Component({ videos }: VideoGroupMessageProps) {
                           videoRefs.current[currentVideoIndex] = el;
                         }
                       }}
-                      src={videos[currentVideoIndex].url}
+                      src={videos[currentVideoIndex].video}
                       className="absolute inset-0 w-full h-full object-cover"
                       controls
                     />
