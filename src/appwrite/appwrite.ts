@@ -383,6 +383,20 @@ export const getVideosBySpaceId = async (spaceId: string) => {
   }
 };
 
+export const getSpaceDetailsBySpaceId = async (spaceId: string) => {
+  try {
+    const response = await databases.getDocument(
+      appwriteConfig.databaseId, 
+      appwriteConfig.spacesId,
+      spaceId 
+    );
+    return response;
+  } catch (error) {
+    console.error('Error fetching space details:', error);
+    throw error; 
+  }
+};
+
 
 export const deleteSpace = async (spaceId: string) => {
   try {
