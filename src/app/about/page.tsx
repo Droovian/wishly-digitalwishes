@@ -20,7 +20,7 @@ const videos = [
 
 export default function About(){
     return (
-        <div className="flex justify-center h-screen bg-yellow-100">
+        <div className="flex justify-center h-screen">
             <VideoGroupMessage videos={videos} />
         </div>
     )

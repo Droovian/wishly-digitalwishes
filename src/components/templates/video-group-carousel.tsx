@@ -1,9 +1,9 @@
 'use client';
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import Confetti from 'react-confetti';
-import { Play, Pause, X } from 'lucide-react'
+import { Play, Pause, X, MousePointerClick } from 'lucide-react'
 import Cake from '@/public/images/cake-image.jpeg';
 import Image from "next/image";
 import AnimatedBirthdayCake from "../birthday-cake";
@@ -23,6 +23,7 @@ export default function Component({ videos }: VideoGroupMessageProps) {
   const [rotateCard, setRotateCard] = useState<boolean>(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState<number | null>(null);
   const [playingVideos, setPlayingVideos] = useState<Set<number>>(new Set());
+  const controls = useAnimation();
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -128,6 +129,7 @@ export default function Component({ videos }: VideoGroupMessageProps) {
 
   const handleCardClick = () => {
     setRotateCard(!rotateCard);
+    controls.start(rotateCard ? "closed" : "open");
   };
 
   const handleVideoToggle = (index: number) => {
@@ -238,36 +240,78 @@ export default function Component({ videos }: VideoGroupMessageProps) {
               className="flex justify-center items-center w-full" 
             >
               <motion.div
-                className="z-20 bg-gradient-to-r from-orange-400 via-red-400 to-red-500 text-white w-[420px] h-[520px] flex justify-center items-center"
+                className="relative z-20 border-2 border-black bg-amber-100 w-[420px] h-[520px] overflow-hidden"
                 variants={topCardVariants}
                 initial="closed"
-                animate={rotateCard ? "open" : "closed"}
+                animate={controls}
                 style={{ transformOrigin: "left center" }}
                 onClick={handleCardClick}
               >
-                {
-                  rotateCard
-                  ? <h1 className="text-4xl font-bold text-black">
-                      
-                    </h1>
-                  : 
-                  <>
-                    <div className="flex flex-col">
-                      <h1 className="text-4xl font-bold text-black">
-                        Happy birthday!
-                      </h1>
+                {rotateCard ? (
+                  <h1 className="text-4xl font-bold text-gray-800">
+                  </h1>
+                ) : (
+                  <div className="relative h-full w-full p-8 flex flex-col items-center justify-center">
+                    {/* Subtle decorative line */}
+                    <motion.div 
+                      className="absolute top-6 left-8 right-8 h-px bg-black"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                    />
+
+                    {/* Main content */}
+                    <div className="relative flex flex-col items-center space-y-8 mt-3">
+                      <motion.div
+                        className="text-center space-y-3"
+                        initial={{ y: -10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.8 }}
+                      >
+                        <h2 className="text-sm font-light tracking-widest mt-2 uppercase">
+                          Dear Dhruv
+                        </h2>
+                        <h1 className="text-4xl font-serif text-gray-800">
+                         Happy Birthday!
+                        </h1>
+                      </motion.div>
 
                       <AnimatedBirthdayCake />
+
+                      <motion.div
+                        className="absolute bottom-[-17px] flex space-x-5 text-sm"
+                        
+                        animate={{ 
+                          opacity: 1,
+                          y: [0, -10, 0],
+                          scale: [1.1, 1.2, 1.1],
+                        }}
+                        transition={{ 
+                          duration: 1.5,
+                          repeat: Infinity,
+                          repeatType: "loop",
+                          ease: "easeInOut"
+                        }}
+                      >
+                        <MousePointerClick size={40} />
+                      </motion.div>
                     </div>
-                  </>
-                }
-                
+
+                    {/* Bottom decorative line */}
+                    <motion.div 
+                      className="absolute bottom-6 left-8 right-8 h-px bg-black"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                    />
+                  </div>
+                )}
               </motion.div>
 
               <motion.div
-                className="z-1 border-l-2 overflow-hidden border-orange-800 bg-gradient-to-r from-orange-400 via-red-400 to-red-500 w-[420px] h-[520px] absolute flex flex-col items-center justify-center p-4"
+                className="z-1 border-l-2 overflow-hidden border-2 border-black bg-amber-100 w-[420px] h-[520px] absolute flex flex-col items-center justify-center p-4"
               >
-                  <p className="text-white text-sm font-light">Click the video</p>
+                  <p className="text-sm font-light">Click the video</p>
                   <div className="grid grid-cols-2 gap-4 w-full h-full overflow-y-auto p-2">
                     {videos.map((video, index) => (
                       <motion.div
@@ -275,7 +319,7 @@ export default function Component({ videos }: VideoGroupMessageProps) {
                         className="relative p-2 rounded-md shadow-lg cursor-pointer bg-white hover:shadow-lg transition-shadow duration-300"
                         whileHover={{
                           scale: 1.05,
-                          rotateX: 10, // Adjust to control the tilt effect
+                          rotateX: 10,
                           rotateY: 10,
                         }}
                         transition={{
