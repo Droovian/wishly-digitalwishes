@@ -2,7 +2,7 @@ import React from 'react'
 
 type BorderButtonProps = {
     text: string
-    onClick: () => void
+    onClick?: () => void
 }
 
 const BorderButton = ({ text, onClick }: BorderButtonProps) => {
