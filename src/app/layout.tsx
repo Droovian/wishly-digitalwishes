@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { UIProvider } from "./(spaces)/UiContext";
 import {
   ClerkProvider,
 } from '@clerk/nextjs'
@@ -29,6 +30,7 @@ export default function RootLayout({
 }>) {
 
   return (
+    <UIProvider>
     <ClerkProvider>
     <html lang="en">
       <body
@@ -39,5 +41,6 @@ export default function RootLayout({
       </body>
     </html>
     </ClerkProvider>
+    </UIProvider>
   );
 }

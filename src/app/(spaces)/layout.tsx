@@ -1,8 +1,9 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
-
+import { UIProvider, useUIContext } from './UiContext';
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
+    <UIProvider>
     <SidebarProvider>
       <AppSidebar />
       
@@ -11,5 +12,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
     </SidebarProvider>
+    </UIProvider>
   )
 }
