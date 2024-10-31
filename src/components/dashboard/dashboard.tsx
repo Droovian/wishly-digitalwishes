@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react'
-import { createInviteDocument, generateInviteToken, getSpacesByCreatorId, createInviteLink, deleteSpace, getInvitesByUserId } from '@/appwrite/appwrite'
+import { createInviteDocument, generateInviteToken, handleDeleteInviteById, getSpacesByCreatorId, createInviteLink, deleteSpace, getInvitesByUserId, viewRsvpList } from '@/appwrite/appwrite'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import { Plus, Mail, Copy, X, Trash } from 'lucide-react'
@@ -34,7 +34,9 @@ export default function Dashboard() {
   const [invitations, setInvitations] = useState<Invitation[]>([])
   const [videoGroups, setVideoGroups] = useState<any[]>([])
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-  const [linkType, setLinkType] = useState<string>('')  // To track which type of link is open
+  const [isRsvpModalOpen, setIsRsvpModalOpen] = useState<boolean>(false)
+  const [currentRsvpList, setCurrentRsvpList] = useState<string[]>([])
+  const [linkType, setLinkType] = useState<string>('') 
   const [currentLink, setCurrentLink] = useState<string>('')
 
   const formInviLink = (InviteId: string) => {
@@ -44,6 +46,17 @@ export default function Dashboard() {
     setIsModalOpen(true);
   }
 
+  const handleViewRsvpList = async (inviteId: string) => {
+    try {
+      const rsvpList = await viewRsvpList(inviteId)
+      setCurrentRsvpList(rsvpList)
+      setIsRsvpModalOpen(true)
+    } catch (error) {
+      console.error('Error viewing RSVP list:', error)
+      toast.error('Failed to load RSVP list. Please try again.')
+    }
+  }
+
   const createCollabLink = async (groupId: string) => {
     const inviteToken = generateInviteToken()
     await createInviteDocument(groupId, inviteToken)
@@ -51,6 +64,18 @@ export default function Dashboard() {
     setCurrentLink(generatedInviteLink)
     setLinkType('collaboration');
     setIsModalOpen(true)
+  }
+
+  const handleDeleteInvite = async (inviteId: string) => {
+    if (window.confirm('Are you sure you want to delete this invitation?')) {
+      try {
+        await handleDeleteInviteById(inviteId);
+        fetchInvitations();
+        toast.success('Invitation deleted successfully!');
+      } catch (error: any) {
+        toast.error(error.message || 'Failed to delete invitation.');
+      }
+    }
   }
 
   const fetchInvitations = async () => {
@@ -146,9 +171,15 @@ export default function Dashboard() {
                   <CardTitle>To: {invitation.hostName}</CardTitle>
                 </CardHeader>
                 <CardFooter>
-                  <Button variant="outline" onClick={() => formInviLink(invitation?.$id)}>
-                    <Mail className="mr-2 h-4 w-4" /> Send
-                  </Button>
+                  <div className='flex space-x-4'>
+                    <Button variant="outline" onClick={() => formInviLink(invitation?.$id)}>
+                      <Mail className="mr-2 h-4 w-4" /> Send
+                    </Button>
+                    <Button variant='outline' onClick={() => handleViewRsvpList(invitation.$id)}>
+                        View RSVP list
+                    </Button>
+                    <Trash color='red' onClick={() => handleDeleteInvite(invitation?.$id)} className="mt-3 mr-2 h-4 w-4" />
+                  </div>
                 </CardFooter>
               </Card>
             ))}
@@ -157,6 +188,33 @@ export default function Dashboard() {
             </Card>
           </div>
         </TabsContent>
+        <Dialog open={isRsvpModalOpen} onOpenChange={setIsRsvpModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>RSVP List</DialogTitle>
+              <DialogDescription>
+                Here's the current list of RSVPs for this invitation.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              {currentRsvpList.length > 0 ? (
+                <ul className="space-y-2">
+                  {currentRsvpList.map((rsvp, index) => (
+                    <li key={index} className="flex items-center">
+                      <span className="text-sm">{rsvp}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No RSVPs yet.</p>
+              )}
+            </div>
+            {/* <Button onClick={() => setIsRsvpModalOpen(false)} variant="outline" className="mt-4">
+              <X className="mr-2 h-4 w-4" />
+              Close
+            </Button> */}
+          </DialogContent>
+        </Dialog>
 
         <TabsContent value="videoGroups">
           {loading ? (
@@ -176,7 +234,7 @@ export default function Dashboard() {
                         </Button>
                         <Button variant="outline" onClick={() => { router.push(`/space/${group.$id}`) }}>Add Video</Button> 
                         
-                          <Trash onClick={()=> handleDeleteSpace(group.$id)} className="mr-2 h-4 w-4" /> 
+                        <Trash color='red' onClick={()=> handleDeleteSpace(group.$id)} className="mr-2 h-4 w-4" /> 
                          
                       </div>
                     </CardContent>

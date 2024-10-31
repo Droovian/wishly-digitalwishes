@@ -185,8 +185,33 @@ export const createVideoSpace = async (spaceData: {
   }
 };
 
+export const handleDeleteInviteById = async (inviteId: string) => {
+  try {
+    await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.invitesCollectionId,
+      inviteId
+    );
+  } catch (error) {
+    console.error('Error deleting invite:', error);
+    throw error;
+  }
+}
 
-//query all the spaces created by the logged in user
+export const viewRsvpList = async (inviteId: string) => {
+  try {
+    const invite = await getInviteByDocumentId(inviteId);
+
+    if (!invite) {
+      throw new Error('Invite not found');
+    }
+
+    return invite.rsvpList;
+  } catch (error) {
+    console.error('Error viewing RSVP list:', error);
+    throw error;
+  }
+}
 
 export const getSpacesByCreatorId = async (creatorId: string, email: string) => {
   try {
